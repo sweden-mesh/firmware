@@ -1,7 +1,7 @@
 # firmware-picker
 
 One static page that finds the right repeater image in the
-[MeshCore-observer releases](https://github.com/the-louie/MeshCore-observer/releases): pick a
+[MeshCore-lou releases](https://github.com/sweden-mesh/MeshCore-lou/releases): pick a
 release and a board, tick "clear flash" for a fresh install, and it lists one file per flavour.
 
 It reads the release list from GitHub's API in the browser (no build step, no server), so a new
