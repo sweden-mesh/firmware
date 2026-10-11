@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repeater firmware</title>
+<style>
+:root{--bg:#fff;--fg:#1b1f23;--muted:#5c6670;--line:#d8dee4;--card:#f6f8fa;--accent:#0b62d6;--warn:#9a6700}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--warn:#d29922}}
+:root[data-theme="dark"]{--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--warn:#d29922}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.4rem;margin:0 0 4px}
+h2{font-size:1rem;margin:0 0 4px}
+p{margin:0 0 8px}
+a{color:var(--accent)}
+.muted{color:var(--muted)}
+dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:12px 0 20px}
+dt{font-weight:600;white-space:nowrap}
+dd{margin:0}
+label{display:block;font-weight:600;margin:16px 0 4px}
+input[type=search],select{width:100%;padding:8px;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px}
+#boards{height:auto}
+.check{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
+.files a{display:inline-block;margin:4px 12px 0 0;word-break:break-all}
+.note{color:var(--warn);font-size:.9rem;margin-top:6px}
+code{font-size:.85em}
+small{color:var(--muted)}
+#out{margin-top:16px}
+</style>
+</head>
+<body>
+<main>
+<h1>Repeater firmware</h1>
+<p class="muted">MeshCore repeater builds with the auto-reply and remote-control features. Pick your board and get the right file.</p>
+
+<dl>
+  <dt>Auto-reply</dt><dd>Answers <code>test</code> on the regional test channel with a signal report, so the mesh can measure itself.</dd>
+  <dt>Remote control</dt><dd>Takes signed commands and firmware updates over MQTT.</dd>
+  <dt>Observer</dt><dd>WiFi boards that also report what they hear to MQTT. Without WiFi (e.g. nRF52), only auto-reply exists.</dd>
+</dl>
+
+<label for="release">Release</label>
+<select id="release"></select>
+
+<label for="filter">Hardware</label>
+<input id="filter" type="search" placeholder="Search, e.g. heltec v3" autocomplete="off">
+<select id="boards" size="8" aria-label="Hardware"></select>
+
+<label class="check"><input id="clear" type="checkbox"> Clear flash (fresh install, erases settings)</label>
+
+<div id="out"><p class="muted">Loading releases…</p></div>
+</main>
+<script>
+const REPO = new URLSearchParams(location.search).get('repo') || 'the-louie/MeshCore-observer';
+
+const FLAVOURS = [
+  {base:'observer', f:'arrc', name:'Auto-reply + remote control', text:'Observer. Everything: answers tests, takes signed commands and updates.'},
+  {base:'observer', f:'ar',   name:'Auto-reply', text:'Observer. Answers tests; no remote commands.'},
+  {base:'observer', f:'rc',   name:'Remote control', text:'Observer. Signed commands and updates; does not answer tests.'},
+  {base:'core',     f:'ar',   name:'Auto-reply, no WiFi', text:'Plain MeshCore repeater that answers tests. Flash by cable.'},
+];
+
+// <board>-<mcu>-v<x.y.z>-lou-<nn>-<features>-<hash>[-merged].<ext>, or the pre-split
+// -ar-<nn>-<hash> names, which carried every feature.
+const NAME = /^(.+?)-(esp32s3|esp32|nrf52840)-v\d+\.\d+\.\d+-(?:lou-\d+-([a-z]+)|ar-\d+)-[0-9a-f]+(-merged)?\.(bin|uf2|zip)$/;
+
+function parse(asset){
+  const m = NAME.exec(asset.name);
+  if (!m) return null;
+  const board = m[1];
+  return {
+    hw: board.replace(/_repeater(_observer_mqtt)?$/, ''),
+    base: /_observer_mqtt$/.test(board) ? 'observer' : 'core',
+    features: m[3] || 'arrc',
+    mcu: m[2],
+    form: m[4] ? 'merged' : m[5],
+    url: asset.browser_download_url,
+    name: asset.name,
+    size: asset.size,
+    sha: (asset.digest || '').replace(/^sha256:/, ''),
+  };
+}
+
+const $ = id => document.getElementById(id);
+let releases = [], current = null, hwList = [];
+
+function state(){
+  const h = new URLSearchParams(location.hash.slice(1));
+  return {r:h.get('r'), hw:h.get('hw'), clear:h.get('clear') === '1'};
+}
+function save(){
+  const h = new URLSearchParams();
+  if (current) h.set('r', current.tag);
+  if ($('boards').value) h.set('hw', $('boards').value);
+  if ($('clear').checked) h.set('clear', '1');
+  history.replaceState(null, '', '#' + h);
+}
+
+function pretty(hw){ return hw.replace(/_/g, ' '); }
+
+function fillBoards(keep){
+  const q = $('filter').value.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
+  const sel = $('boards');
+  const want = keep || sel.value;
+  sel.innerHTML = '';
+  for (const hw of hwList){
+    if (q && !pretty(hw).toLowerCase().includes(q)) continue;
+    const o = new Option(pretty(hw), hw);
+    if (hw === want) o.selected = true;
+    sel.add(o);
+  }
+  if (!sel.value && sel.options.length === 1) sel.selectedIndex = 0;
+}
+
+function pickRelease(tag){
+  current = releases.find(r => r.tag === tag) || releases[0];
+  $('release').value = current.tag;
+  const seen = new Map();
+  for (const i of current.images) if (!seen.has(i.hw.toLowerCase())) seen.set(i.hw.toLowerCase(), i.hw);
+  hwList = [...seen.values()].sort((a, b) => a.localeCompare(b, undefined, {sensitivity:'base'}));
+}
+
+function link(i, how){
+  return `<a href="${i.url}" download>${i.name}</a> <small>${(i.size/1048576).toFixed(1)} MB · ${how}${i.sha ? ` · sha256 ${i.sha.slice(0,12)}…` : ''}</small><br>`;
+}
+
+function render(){
+  save();
+  const hw = $('boards').value, clear = $('clear').checked, out = $('out');
+  if (!current){ return; }
+  if (!hw){ out.innerHTML = '<p class="muted">Choose your hardware.</p>'; return; }
+  const imgs = current.images.filter(i => i.hw.toLowerCase() === hw.toLowerCase());
+  let html = `<p class="muted"><a href="${current.html}">${current.tag}</a>${current.pre ? ' (pre-release)' : ''}</p>`;
+  for (const fl of FLAVOURS){
+    const set = imgs.filter(i => i.base === fl.base && i.features === fl.f);
+    if (!set.length) continue;
+    let files = '', note = '';
+    if (set[0].mcu.startsWith('esp32')){
+      const i = set.find(x => x.form === (clear ? 'merged' : 'bin'));
+      if (!i) continue;
+      files = link(i, clear ? 'erase, then write at 0x0' : 'write at 0x10000, keeps settings');
+    } else {
+      for (const i of set) files += link(i, i.form === 'uf2' ? 'drag onto the boot drive' : 'nRF DFU package');
+      if (clear) note = '<p class="note">These files never erase. Erase the device first (e.g. the erase option in the MeshCore web flasher), then flash.</p>';
+    }
+    html += `<div class="card"><h2>${fl.name}</h2><p class="muted">${fl.text}</p><div class="files">${files}</div>${note}</div>`;
+  }
+  out.innerHTML = html.includes('class="card"') ? html : html + '<p>No image for this board in this release.</p>';
+}
+
+async function load(){
+  let list;
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=50`);
+    if (!r.ok) throw new Error(r.status === 403 ? 'GitHub rate limit reached, try again in an hour' : `GitHub said ${r.status}`);
+    list = await r.json();
+  } catch (e) {
+    $('out').innerHTML = `<p>Could not load releases: ${e.message}. <a href="https://github.com/${REPO}/releases">All releases on GitHub</a>.</p>`;
+    return;
+  }
+  releases = list.filter(r => !r.draft).map(r => ({
+    tag: r.tag_name, pre: r.prerelease, html: r.html_url,
+    images: r.assets.map(parse).filter(Boolean),
+  })).filter(r => r.images.length);
+  if (!releases.length){ $('out').innerHTML = '<p>No releases found.</p>'; return; }
+  for (const r of releases) $('release').add(new Option(r.tag + (r.pre ? ' (pre-release)' : ''), r.tag));
+  const s = state();
+  $('clear').checked = s.clear;
+  pickRelease(s.r);
+  fillBoards(s.hw);
+  render();
+}
+
+$('release').onchange = () => { const keep = $('boards').value; pickRelease($('release').value); fillBoards(keep); render(); };
+$('filter').oninput = () => { fillBoards(); render(); };
+$('boards').onchange = render;
+$('clear').onchange = render;
+load();
+</script>
+</body>
+</html>
