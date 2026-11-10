@@ -69,8 +69,8 @@ footer{margin-top:36px;font-size:.85rem;color:var(--muted)}
 <fieldset id="s-install">
   <legend><span class="n">3</span>Installation</legend>
   <div class="opts">
-    <label class="opt"><input type="radio" name="install" value="new" checked><span><b>New install</b><small>Clear flash. Erases everything, settings included.</small></span></label>
-    <label class="opt"><input type="radio" name="install" value="update"><span><b>Update</b><small>Keeps the node's settings and identity.</small></span></label>
+    <label class="opt"><input type="radio" name="install" value="update" checked><span><b>Install</b><small>Keeps the node's settings and identity.</small></span></label>
+    <label class="opt"><input type="radio" name="install" value="new"><span><b>Clear flash</b><small>Erases everything, settings included.</small></span></label>
   </div>
 </fieldset>
 
@@ -117,7 +117,7 @@ function readHash(){
     const f = h.get('f').split(',');
     for (const i of document.querySelectorAll('input[name="f"]')) i.checked = !i.disabled && f.includes(i.value);
   }
-  if (h.get('install') === 'update') document.querySelector('input[name="install"][value="update"]').checked = true;
+  if (h.get('install') === 'new') document.querySelector('input[name="install"][value="new"]').checked = true;
   return {hw: h.get('hw'), r: h.get('r')};
 }
 function writeHash(){
@@ -198,7 +198,7 @@ function render(){
   const names = {ar: 'Auto-reply', rc: 'Remote control', arrc: 'Auto-reply and remote control'};
   out.innerHTML = `<div class="card">
     <h2>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h2>
-    <p class="muted">${release.tag}${release.prerelease ? ' (pre-release)' : ''} · ${fresh ? 'new install' : 'update'} · <a href="${release.url}">release notes</a></p>
+    <p class="muted">${release.tag}${release.prerelease ? ' (pre-release)' : ''} · ${fresh ? 'clear flash' : 'install'} · <a href="${release.url}">release notes</a></p>
     <a class="dl" href="${img.url}" download>Download (${mb(img.size)})</a>
     <p class="file">${img.file}${img.sha256 ? `<br><small class="muted">sha256 ${img.sha256}</small>` : ''}</p>
     ${how}</div>`;

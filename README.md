@@ -2,7 +2,7 @@
 
 One static page that leads to the right MeshCore firmware image from
 [sweden-mesh/MeshCore-lou](https://github.com/sweden-mesh/MeshCore-lou/releases): type of node,
-then features (Observer, auto-reply, remote control, later auto-scope), new install or update,
+then features (Observer, auto-reply, remote control, later auto-scope), install or clear flash,
 then the board. The answer is one file and how to flash it.
 
 - `index.html` — the page. No build step, no framework.
