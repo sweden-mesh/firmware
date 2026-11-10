@@ -377,11 +377,19 @@ function renderResult(){
   const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === code);
   if (!set.length){ out.innerHTML = '<div class="result neutral"><p class="meta" style="margin:0">Det finns ingen fil för det här kortet med de här funktionerna.</p></div>'; return; }
   const fresh = checked('install')[0] === 'new';
-  const esp = set[0].mcu.startsWith('esp32');
-  const img = esp ? set.find(i => i.form === (fresh ? 'merged' : 'bin')) : (set.find(i => i.form === 'uf2') || set[0]);
+  const mcu = set[0].mcu, esp = mcu.startsWith('esp32'), stm = mcu.startsWith('stm32'), rp = mcu === 'rp2040';
+  const img = esp ? set.find(i => i.form === (fresh ? 'merged' : 'bin'))
+            : stm ? (set.find(i => i.form === 'hex') || set[0])
+            : (set.find(i => i.form === 'uf2') || set[0]);
   const dfu = !esp && set.find(i => i.form === 'zip');
   let how;
-  if (esp && fresh){
+  if (stm){
+    how = `<ol class="how"><li>Anslut kortet med en ST-Link, eller via chipets seriella bootloader.</li>
+      <li>Skriv <code>.hex</code>-filen med <a href="https://www.st.com/en/development-tools/stm32cubeprog.html" target="_blank" rel="noopener">STM32CubeProgrammer</a>${fresh ? ', efter att ha raderat flashminnet (<i>Full chip erase</i>)' : ''}.</li></ol>`;
+  } else if (rp){
+    how = `<ol class="how"><li>Håll ned BOOTSEL-knappen medan du ansluter kortet: det dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
+      ${fresh ? '<p class="note">Filen raderar inte inställningarna. Radera kortet först för en ren start.</p>' : ''}`;
+  } else if (esp && fresh){
     how = `<ol class="how"><li>Öppna <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">MeshCores webbflashare</a> (Chrome eller Edge), eller använd esptool.</li>
       <li>Radera flashminnet och skriv sedan filen på adress <code>0x0</code>.</li></ol>`;
   } else if (esp){

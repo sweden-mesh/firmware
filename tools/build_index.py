@@ -21,7 +21,7 @@ REPO = sys.argv[1] if len(sys.argv) > 1 else "sweden-mesh/MeshCore-lou"
 NAME = re.compile(
     r"^(?P<board>.+?)-(?P<mcu>esp32s3|esp32c6|esp32c3|esp32|nrf52840|rp2040|stm32\w*)"
     r"-v(?P<base_version>\d+\.\d+\.\d+)-(?:lou-(?P<rev>\d+)-(?P<features>[a-z]+)|ar-(?P<old_rev>\d+))"
-    r"-[0-9a-f]+(?P<merged>-merged)?\.(?P<ext>bin|uf2|zip)$")
+    r"-[0-9a-f]+(?P<merged>-merged)?\.(?P<ext>bin|uf2|zip|hex)$")
 
 
 def get(url):
