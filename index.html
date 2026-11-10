@@ -104,6 +104,17 @@ pre.cmds{margin:6px 0 0;padding:14px 16px;border-radius:12px;background:#0f1a17;
 .cmd-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
 .copy{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:6px 12px;font:600 .85rem system-ui,sans-serif;cursor:pointer}
 .copy:hover{border-color:var(--accent)}
+.key-row{display:flex;gap:8px;margin-top:6px}
+.key-row input{margin-top:0!important}
+.key-row .copy{white-space:nowrap}
+dialog.keydlg{border:0;border-radius:16px;padding:0;max-width:560px;width:calc(100% - 32px);background:var(--surface);color:var(--fg);box-shadow:0 20px 60px rgb(0 0 0/.35)}
+dialog.keydlg::backdrop{background:rgb(8 16 14/.55)}
+.keydlg .body{padding:22px 22px 18px}
+.keydlg h3{margin:0 0 8px;font-size:1.2rem}
+.keydlg .secret{font:.9rem/1.5 ui-monospace,Menlo,Consolas,monospace;word-break:break-all;background:#0f1a17;color:#d7f3ee;border-radius:10px;padding:12px 14px;margin:12px 0}
+.keydlg ul{margin:8px 0 0;padding-left:20px;font-size:.93rem}
+.keydlg li{margin:4px 0}
+.keydlg .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line)}
 details.ver{margin-top:18px;font-size:.9rem}
 details.ver summary{cursor:pointer;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;color:var(--muted)}
@@ -115,8 +126,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   <div class="wrap">
     <p class="eyebrow">sweden-mesh</p>
     <h1>lou-firmware för MeshCore</h1>
-    <p>lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla kort som har plats.</p>
-    <p>Varje version heter efter MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-15</code>.</p>
+    <p>lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla enheter som har plats.</p>
+    <p>Varje version heter som MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-15</code>.</p>
     <div class="links">
       <a class="btn btn-light" href="#valj">Hitta din fil</a>
       <a class="btn btn-ghost" href="https://github.com/sweden-mesh/MeshCore-lou#readme">Läs mer i README</a>
@@ -145,11 +156,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
       <header><h3>Fjärrstyrning</h3><span class="tag">rc</span></header>
       <dl>
         <dt>Problemet</dt>
-        <dd>En repeater sitter ofta på ett tak eller i en mast. Att ändra en inställning betyder en resa dit, eller en inloggning över meshet som kostar sändningstid.</dd>
+        <dd>Den som har flera repeatrar utspridda över ett stort område, på tak och i master långt från varandra, måste i dag åka till var och en eller logga in på dem en i taget över meshet för att ändra en inställning. Det tar tid, och varje inloggning kostar sändningstid.</dd>
         <dt>Så löser vi det</dt>
         <dd>Ägaren skickar kommandon via nodens MQTT-anslutning, signerade med en nyckel bara ägaren har. Noden kör ett kommando bara om signaturen stämmer, och nodens identitet, radio och nyckel går aldrig att ändra på distans.</dd>
         <dt>Att tänka på</dt>
-        <dd>Kräver Observer och wifi, och noden nås bara när MQTT-servern gör det. Tappar du nyckeln kan du inte längre styra noden på distans. Nyckeln läggs in via kabel.</dd>
+        <dd>Kräver Observer och wifi, och noden nås bara när MQTT-servern gör det. Tappar du nyckeln kan du inte längre styra noden på distans. Nyckeln läggs in via kabel, och kommandona skickas med <a href="https://github.com/sweden-mesh/mccontrol">mccontrol</a>.</dd>
       </dl>
       <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/mqtt-control.md">Dokumentation om fjärrstyrning →</a>
     </article>
@@ -160,8 +171,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
       <p>Skickar det noden hör till en MQTT-server, till exempel meshat.se. Kräver wifi. Våra Observer-filer uppdaterar sig själva över wifi, med signerade uppdateringar. <a href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/ota.md">Om uppdateringarna</a> · <a href="https://observer.gessaman.com/">Observer-firmware</a></p>
     </article>
     <article class="feature">
-      <header><h3>Auto-scope</h3><span class="tag ext">kommer</span></header>
-      <p>Ställer in nodens region automatiskt, för repeatrar och för companions. Inte klar än.</p>
+      <header><h3>Auto-scope</h3><span class="tag">as</span></header>
+      <p>Ställer in nodens region automatiskt, för repeatrar och för companions. Kommer snart.</p>
     </article>
   </div>
 </section>
@@ -213,9 +224,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
         <p class="hint" id="lan-hint" style="margin:-4px 0 12px"></p>
       </div>
       <div id="cfg-rc">
-        <label class="field">Din kommandonyckel, den publika halvan (64 hextecken)
-          <input type="text" id="pubkey" autocomplete="off" spellcheck="false" maxlength="64" placeholder="t.ex. 38A263C4…" aria-describedby="pubkey-hint"></label>
-        <p class="hint" id="pubkey-hint" style="margin:-4px 0 12px">Nyckeln kan bara läggas in via kabel. Den hemliga halvan behåller du själv och lämnar aldrig ut.</p>
+        <label class="field" for="pubkey">Din kommandonyckel, den publika halvan (64 hextecken)</label>
+        <div class="key-row">
+          <input type="text" id="pubkey" autocomplete="off" spellcheck="false" maxlength="64" placeholder="t.ex. 38A263C4…" aria-describedby="pubkey-hint">
+          <button type="button" class="copy" id="genkey">Generera ny</button>
+        </div>
+        <p class="hint" id="pubkey-hint" style="margin:8px 0 12px">Nyckeln kan bara läggas in via kabel. Den hemliga halvan behåller du själv och lämnar aldrig ut.</p>
       </div>
       <div class="cmd-row"><b>Kommandon</b><button type="button" class="copy" id="copy">Kopiera</button></div>
       <pre class="cmds" id="cmds"></pre>
@@ -230,13 +244,32 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 </section>
 </main>
 
+<dialog class="keydlg" id="keydlg" aria-labelledby="keydlg-h">
+  <div class="body">
+    <h3 id="keydlg-h">Din nya privata nyckel</h3>
+    <p>Spara den nu. Den visas bara den här gången, och den skapades här i din webbläsare: den har inte skickats någonstans.</p>
+    <div class="secret" id="seed"></div>
+    <ul>
+      <li>Lägg in den i <a href="https://github.com/sweden-mesh/mccontrol" target="_blank" rel="noopener"><b>mccontrol</b></a>, verktyget du skickar kommandona med: importera den som nyckel (<i>Import a seed</i>), eller spara den som filen <code>~/.config/mccontrol/key.seed</code>.</li>
+      <li>Den som har nyckeln kan styra dina noder. Dela den aldrig och lägg den inte i något repo.</li>
+      <li>Tappar du den kan du inte längre styra noderna på distans, bara lägga in en ny nyckel via kabel.</li>
+      <li>Den publika halvan är redan ifylld i fältet, och kommandona har uppdaterats.</li>
+    </ul>
+  </div>
+  <div class="actions">
+    <button type="button" class="copy" id="seed-copy">Kopiera</button>
+    <button type="button" class="copy" id="seed-save">Spara som fil</button>
+    <button type="button" class="btn btn-main" id="seed-done">Jag har sparat den</button>
+  </div>
+</dialog>
+
 <footer>
   <div class="wrap">Byggt av sweden-mesh från <a href="https://github.com/sweden-mesh/MeshCore-lou">MeshCore-lou</a>, på <a href="https://github.com/meshcore-dev/MeshCore">MeshCore</a> och <a href="https://github.com/agessaman/MeshCore">agessamans Observer</a>. <span id="gen"></span></div>
 </footer>
 
 <script>
 const INDEX = 'index.json';
-const STOCK_FLASHER = 'https://flasher.meshcore.co.uk/';
+const STOCK_FLASHER = 'https://meshcore.io/flasher';
 const OBSERVER_HOME = 'https://observer.gessaman.com/';
 
 const REGION_LIST = 'https://raw.githubusercontent.com/zombiefredrik/meshcore-se-regioner/main/data/regioner.csv';
@@ -349,10 +382,10 @@ function renderResult(){
   const dfu = !esp && set.find(i => i.form === 'zip');
   let how;
   if (esp && fresh){
-    how = `<ol class="how"><li>Öppna <a href="${STOCK_FLASHER}">MeshCores webbflashare</a> (Chrome eller Edge), eller använd esptool.</li>
+    how = `<ol class="how"><li>Öppna <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">MeshCores webbflashare</a> (Chrome eller Edge), eller använd esptool.</li>
       <li>Radera flashminnet och skriv sedan filen på adress <code>0x0</code>.</li></ol>`;
   } else if (esp){
-    how = `<ol class="how"><li>Skriv filen på adress <code>0x10000</code> med webbflasharen eller esptool. Inställningarna finns kvar.</li>
+    how = `<ol class="how"><li>Skriv filen på adress <code>0x10000</code> med <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">webbflasharen</a> eller esptool. Inställningarna finns kvar.</li>
       ${base === 'observer' ? '<li>Eller, på en nod som redan kör den här firmwaren: <code>ota update</code> i nodens konsol hämtar den över wifi.</li>' : ''}</ol>`;
   } else {
     how = `<ol class="how"><li>Dubbelklicka på reset: kortet dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
@@ -448,6 +481,40 @@ for (const i of document.querySelectorAll('input[name="f"]')){
 for (const i of document.querySelectorAll('input[name="install"]')) i.addEventListener('change', render);
 $('lan').addEventListener('change', render);
 $('pubkey').addEventListener('input', renderConfig);
+const hex = bytes => [...bytes].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+
+// An Ed25519 key made here and never sent anywhere: the public half fills the field, the
+// private seed is shown once. mccontrol stores the same 32-byte seed as 64 hex characters.
+$('genkey').addEventListener('click', async () => {
+  let seed, pub;
+  try {
+    const pair = await crypto.subtle.generateKey({name: 'Ed25519'}, true, ['sign', 'verify']);
+    pub = new Uint8Array(await crypto.subtle.exportKey('raw', pair.publicKey));
+    seed = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey)).slice(-32);
+  } catch {
+    $('pubkey-hint').textContent = 'Den här webbläsaren kan inte skapa nycklar. Använd en ny version av Chrome, Edge, Firefox eller Safari, eller mccontrol keygen.';
+    return;
+  }
+  $('pubkey').value = hex(pub);
+  $('seed').textContent = hex(seed);
+  renderConfig();
+  $('keydlg').showModal();
+});
+$('seed-copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('seed').textContent); $('seed-copy').textContent = 'Kopierat'; }
+  catch { $('seed-copy').textContent = 'Markera och kopiera'; }
+  setTimeout(() => { $('seed-copy').textContent = 'Kopiera'; }, 1500);
+});
+$('seed-save').addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([$('seed').textContent + '\n'], {type: 'text/plain'}));
+  a.download = 'key.seed';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+$('seed-done').addEventListener('click', () => { $('keydlg').close(); $('seed').textContent = ''; });
+$('keydlg').addEventListener('cancel', e => e.preventDefault());
+
 $('copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText($('cmds').textContent); $('copy').textContent = 'Kopierat'; }
   catch { $('copy').textContent = 'Markera och kopiera'; }
