@@ -171,7 +171,7 @@ function render(){
   const out = $('out'), {base, code, f} = wanted();
   if (!code){
     out.innerHTML = f.has('obs')
-      ? onward('The Observer without auto-reply or remote control is agessaman\'s firmware, published by him.', OBSERVER_HOME, 'Observer firmware')
+      ? onward('The Observer without auto-reply or remote control is agessaman\'s firmware, published by them.', OBSERVER_HOME, 'Observer firmware')
       : onward('Plain MeshCore, with none of these features, comes from the MeshCore project and its web flasher.', STOCK_FLASHER, 'MeshCore web flasher');
     return;
   }
