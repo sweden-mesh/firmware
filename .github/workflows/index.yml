@@ -1,0 +1,37 @@
+# Keeps index.json in step with the releases of the source repository: hourly, and on
+# demand. It runs here rather than in the visitor's browser because GitHub's release
+# downloads cannot be read by another site's page, and the API limits each visitor.
+name: Update the firmware index
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: index
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build index.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 tools/build_index.py sweden-mesh/MeshCore-lou > index.json.new
+      - name: Commit when the releases changed
+        run: |
+          # The generation time changes on every run; only the releases decide a commit.
+          strip() { python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); d.pop("generated"); print(json.dumps(d, sort_keys=True))' "$1"; }
+          if [ -f index.json ] && [ "$(strip index.json)" = "$(strip index.json.new)" ]; then
+            echo "no change"; exit 0
+          fi
+          mv index.json.new index.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add index.json
+          git commit -m "index: the releases of sweden-mesh/MeshCore-lou"
+          git push

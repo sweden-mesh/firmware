@@ -1,19 +1,34 @@
-# firmware-picker
+# firmware
 
-One static page that finds the right repeater image in the
-[MeshCore-lou releases](https://github.com/sweden-mesh/MeshCore-lou/releases): pick a
-release and a board, tick "clear flash" for a fresh install, and it lists one file per flavour.
+One static page that leads to the right MeshCore firmware image from
+[sweden-mesh/MeshCore-lou](https://github.com/sweden-mesh/MeshCore-lou/releases): type of node,
+then features (Observer, auto-reply, remote control, later auto-scope), new install or update,
+then the board. The answer is one file and how to flash it.
 
-It reads the release list from GitHub's API in the browser (no build step, no server), so a new
-release appears without touching this repository. Image names are parsed as
-`<board>-<mcu>-v<x.y.z>-lou-<nn>-<features>-<hash>[-merged].<ext>`; the pre-split
-`-ar-<nn>-<hash>` names count as every feature.
+- `index.html` — the page. No build step, no framework.
+- `index.json` — every image in the releases: board, base (stock or Observer), features, chip,
+  file, size, sha256 and download URL. The page reads only this file, so a visitor makes one
+  request to this site and is never rate limited by GitHub's API.
+- `tools/build_index.py` — writes `index.json` from the releases.
+- `.github/workflows/index.yml` — runs it hourly and on demand, and commits `index.json` when
+  the releases changed. A new release shows up within the hour; run the workflow to see it now.
 
-- Another repository: `index.html?repo=owner/name`.
-- A link to one board: the page keeps release, board and clear flash in the URL (`#r=…&hw=…&clear=1`).
-- Unauthenticated API use is limited to 60 requests an hour per visitor's IP; the page makes one.
+The binaries stay in the releases and are downloaded from there. The page cannot flash a board
+itself: GitHub's release downloads cannot be read by another site's page.
+
+Choices with no image of ours lead onward: no features to MeshCore's web flasher, the Observer
+alone to agessaman's Observer firmware.
+
+The choice lives in the URL, so a link can be shared: `#f=obs,ar,rc&install=new&hw=heltec_v4`.
 
 ## Hosting
 
-GitHub Pages: push this repository, then Settings → Pages → Deploy from a branch → `main`, `/ (root)`.
-Any static host works the same way; it is one HTML file.
+GitHub Pages: Settings → Pages → Deploy from a branch → `main`, `/ (root)`.
+The page is then at https://sweden-mesh.github.io/firmware/.
+
+## Locally
+
+```
+python3 tools/build_index.py > index.json
+python3 -m http.server
+```

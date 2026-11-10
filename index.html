@@ -3,181 +3,241 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Repeater firmware</title>
+<title>MeshCore firmware</title>
+<meta name="description" content="Pick a MeshCore firmware with auto-reply, remote control or Observer for your board and get one file.">
 <style>
-:root{--bg:#fff;--fg:#1b1f23;--muted:#5c6670;--line:#d8dee4;--card:#f6f8fa;--accent:#0b62d6;--warn:#9a6700}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--warn:#d29922}}
-:root[data-theme="dark"]{--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--warn:#d29922}
+:root{--bg:#fff;--fg:#1b1f23;--muted:#5c6670;--line:#d8dee4;--card:#f6f8fa;--accent:#0b62d6;--accent-bg:#e8f1fd;--warn:#9a6700;--off:#8c959f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--accent-bg:#132339;--warn:#d29922;--off:#6e7681}}
+:root[data-theme="dark"]{--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--accent-bg:#132339;--warn:#d29922;--off:#6e7681}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
-h1{font-size:1.4rem;margin:0 0 4px}
-h2{font-size:1rem;margin:0 0 4px}
+main{max-width:760px;margin:0 auto;padding:24px 16px 56px}
+h1{font-size:1.45rem;margin:0 0 4px}
 p{margin:0 0 8px}
 a{color:var(--accent)}
 .muted{color:var(--muted)}
-dl{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;margin:12px 0 20px}
-dt{font-weight:600;white-space:nowrap}
-dd{margin:0}
-label{display:block;font-weight:600;margin:16px 0 4px}
+fieldset{border:0;padding:0;margin:28px 0 0}
+legend{font-weight:700;font-size:1.05rem;padding:0;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+legend .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:.8rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-bg)}
+.opt:has(input:disabled){cursor:not-allowed;color:var(--off)}
+.opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.opt b{display:block}
+.opt small{color:var(--muted);display:block;line-height:1.35}
+.opt:has(input:disabled) small{color:var(--off)}
 input[type=search],select{width:100%;padding:8px;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px}
-#boards{height:auto}
-.check{display:flex;gap:8px;align-items:center;font-weight:400;margin-top:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
-.files a{display:inline-block;margin:4px 12px 0 0;word-break:break-all}
-.note{color:var(--warn);font-size:.9rem;margin-top:6px}
+#boards{margin-top:6px}
+.hint{font-size:.9rem;color:var(--muted);margin-top:6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-top:28px}
+.card h2{font-size:1.1rem;margin:0 0 6px}
+.dl{display:inline-block;margin:6px 0 4px;padding:9px 14px;border-radius:6px;background:var(--accent);color:var(--bg);text-decoration:none;font-weight:600}
+.file{word-break:break-all;font-size:.85rem}
+.note{color:var(--warn);font-size:.9rem}
+ol.how{margin:8px 0 0;padding-left:20px}
 code{font-size:.85em}
-small{color:var(--muted)}
-#out{margin-top:16px}
+details{margin-top:28px;font-size:.9rem}
+summary{cursor:pointer;color:var(--muted)}
+footer{margin-top:36px;font-size:.85rem;color:var(--muted)}
 </style>
 </head>
 <body>
 <main>
-<h1>Repeater firmware</h1>
-<p class="muted">MeshCore repeater builds with the auto-reply and remote-control features. Pick your board and get the right file.</p>
+<h1>MeshCore firmware</h1>
+<p class="muted">Choose what your node should do and which board it runs on. You get one file and how to flash it.</p>
 
-<dl>
-  <dt>Auto-reply</dt><dd>Answers <code>test</code> on the regional test channel with a signal report, so the mesh can measure itself.</dd>
-  <dt>Remote control</dt><dd>Takes signed commands and firmware updates over MQTT.</dd>
-  <dt>Observer</dt><dd>WiFi boards that also report what they hear to MQTT. Without WiFi (e.g. nRF52), only auto-reply exists.</dd>
-</dl>
+<fieldset id="s-type">
+  <legend><span class="n">1</span>Type of node</legend>
+  <div class="opts">
+    <label class="opt"><input type="radio" name="type" value="repeater" checked><span><b>Repeater</b><small>A fixed node that relays traffic for others.</small></span></label>
+    <label class="opt"><input type="radio" name="type" value="companion" disabled><span><b>Companion</b><small>The radio you pair with the app. Comes with auto-scope.</small></span></label>
+  </div>
+</fieldset>
 
-<label for="release">Release</label>
-<select id="release"></select>
+<fieldset id="s-features">
+  <legend><span class="n">2</span>Features</legend>
+  <div class="opts">
+    <label class="opt"><input type="checkbox" name="f" value="obs"><span><b>Observer</b><small>Reports what it hears to an MQTT server such as meshat.se. WiFi boards only.</small></span></label>
+    <label class="opt"><input type="checkbox" name="f" value="ar" checked><span><b>Auto-reply</b><small>Answers <code>test</code> on the regional test channel with a signal report, so the mesh can measure itself.</small></span></label>
+    <label class="opt"><input type="checkbox" name="f" value="rc"><span><b>Remote control</b><small>Takes signed commands and updates over MQTT. Needs Observer.</small></span></label>
+    <label class="opt"><input type="checkbox" name="f" value="as" disabled><span><b>Auto-scope</b><small>Sets the region scope automatically. Coming.</small></span></label>
+  </div>
+</fieldset>
 
-<label for="filter">Hardware</label>
-<input id="filter" type="search" placeholder="Search, e.g. heltec v3" autocomplete="off">
-<select id="boards" size="8" aria-label="Hardware"></select>
+<fieldset id="s-install">
+  <legend><span class="n">3</span>Installation</legend>
+  <div class="opts">
+    <label class="opt"><input type="radio" name="install" value="new" checked><span><b>New install</b><small>Clear flash. Erases everything, settings included.</small></span></label>
+    <label class="opt"><input type="radio" name="install" value="update"><span><b>Update</b><small>Keeps the node's settings and identity.</small></span></label>
+  </div>
+</fieldset>
 
-<label class="check"><input id="clear" type="checkbox"> Clear flash (fresh install, erases settings)</label>
+<fieldset id="s-hw">
+  <legend><span class="n">4</span>Hardware</legend>
+  <input id="filter" type="search" placeholder="Search, e.g. heltec v3" autocomplete="off" aria-label="Search hardware">
+  <select id="boards" size="9" aria-label="Hardware"></select>
+  <p id="hw-hint" class="hint"></p>
+</fieldset>
 
-<div id="out"><p class="muted">Loading releases…</p></div>
+<div id="out" aria-live="polite"><p class="muted">Loading…</p></div>
+
+<details id="adv">
+  <summary>Release</summary>
+  <p style="margin-top:8px"><select id="release" aria-label="Release"></select></p>
+  <p class="muted">The newest full release is chosen by default. All files are in the <a id="all" href="#">releases on GitHub</a>.</p>
+</details>
+
+<footer>Built by sweden-mesh from <a href="https://github.com/sweden-mesh/MeshCore-lou">MeshCore-lou</a>, on <a href="https://github.com/meshcore-dev/MeshCore">MeshCore</a> and <a href="https://github.com/agessaman/MeshCore">agessaman's Observer</a>. <span id="gen"></span></footer>
 </main>
 <script>
-const REPO = new URLSearchParams(location.search).get('repo') || 'sweden-mesh/MeshCore-lou';
-
-const FLAVOURS = [
-  {base:'observer', f:'arrc', name:'Auto-reply + remote control', text:'Observer. Everything: answers tests, takes signed commands and updates.'},
-  {base:'observer', f:'ar',   name:'Auto-reply', text:'Observer. Answers tests; no remote commands.'},
-  {base:'observer', f:'rc',   name:'Remote control', text:'Observer. Signed commands and updates; does not answer tests.'},
-  {base:'core',     f:'ar',   name:'Auto-reply, no WiFi', text:'Plain MeshCore repeater that answers tests. Flash by cable.'},
-];
-
-// <board>-<mcu>-v<x.y.z>-lou-<nn>-<features>-<hash>[-merged].<ext>, or the pre-split
-// -ar-<nn>-<hash> names, which carried every feature.
-const NAME = /^(.+?)-(esp32s3|esp32|nrf52840)-v\d+\.\d+\.\d+-(?:lou-\d+-([a-z]+)|ar-\d+)-[0-9a-f]+(-merged)?\.(bin|uf2|zip)$/;
-
-function parse(asset){
-  const m = NAME.exec(asset.name);
-  if (!m) return null;
-  const board = m[1];
-  return {
-    hw: board.replace(/_repeater(_observer_mqtt)?$/, ''),
-    base: /_observer_mqtt$/.test(board) ? 'observer' : 'core',
-    features: m[3] || 'arrc',
-    mcu: m[2],
-    form: m[4] ? 'merged' : m[5],
-    url: asset.browser_download_url,
-    name: asset.name,
-    size: asset.size,
-    sha: (asset.digest || '').replace(/^sha256:/, ''),
-  };
-}
+const INDEX = 'index.json';
+const STOCK_FLASHER = 'https://flasher.meshcore.co.uk/';
+const OBSERVER_HOME = 'https://observer.gessaman.com/';
 
 const $ = id => document.getElementById(id);
-let releases = [], current = null, hwList = [];
+const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
+let index = null, release = null;
 
-function state(){
-  const h = new URLSearchParams(location.hash.slice(1));
-  return {r:h.get('r'), hw:h.get('hw'), clear:h.get('clear') === '1'};
+function pretty(hw){ const s = hw.replace(/_/g, ' '); return s[0].toUpperCase() + s.slice(1); }
+function mb(n){ return (n / 1048576).toFixed(1) + ' MB'; }
+
+// The features ticked, as the image's base and feature code; null when no image of ours fits.
+function wanted(){
+  const f = new Set(checked('f'));
+  const base = f.has('obs') ? 'observer' : 'core';
+  const code = (f.has('ar') ? 'ar' : '') + (f.has('rc') ? 'rc' : '');
+  return {base, code, f};
 }
-function save(){
+
+function readHash(){
+  const h = new URLSearchParams(location.hash.slice(1));
+  if (h.has('f')){
+    const f = h.get('f').split(',');
+    for (const i of document.querySelectorAll('input[name="f"]')) i.checked = !i.disabled && f.includes(i.value);
+  }
+  if (h.get('install') === 'update') document.querySelector('input[name="install"][value="update"]').checked = true;
+  return {hw: h.get('hw'), r: h.get('r')};
+}
+function writeHash(){
   const h = new URLSearchParams();
-  if (current) h.set('r', current.tag);
+  h.set('f', checked('f').join(','));
+  h.set('install', checked('install')[0]);
   if ($('boards').value) h.set('hw', $('boards').value);
-  if ($('clear').checked) h.set('clear', '1');
+  if (release && index && release !== index.releases[0]) h.set('r', release.tag);
   history.replaceState(null, '', '#' + h);
 }
 
-function pretty(hw){ return hw.replace(/_/g, ' '); }
+function pickRelease(tag){
+  const full = index.releases.filter(r => !r.prerelease);
+  release = index.releases.find(r => r.tag === tag) || full[0] || index.releases[0];
+  $('release').value = release.tag;
+}
 
 function fillBoards(keep){
+  const {base, code} = wanted();
   const q = $('filter').value.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
-  const sel = $('boards');
-  const want = keep || sel.value;
+  const sel = $('boards'), want = keep || sel.value;
+  const hws = [...new Set(release.images.filter(i => i.base === base && i.features === code).map(i => i.hw))]
+    .sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
   sel.innerHTML = '';
-  for (const hw of hwList){
+  let group = null, shown = 0;
+  for (const hw of hws){
     if (q && !pretty(hw).toLowerCase().includes(q)) continue;
+    const maker = hw.split('_')[0].toLowerCase();
+    if (!group || group.dataset.maker !== maker){
+      group = document.createElement('optgroup');
+      group.label = hw.split('_')[0];
+      group.dataset.maker = maker;
+      sel.add(group);
+    }
     const o = new Option(pretty(hw), hw);
     if (hw === want) o.selected = true;
-    sel.add(o);
+    group.append(o);
+    shown++;
   }
-  if (!sel.value && sel.options.length === 1) sel.selectedIndex = 0;
+  $('hw-hint').textContent = !hws.length ? '' :
+    want && !hws.includes(want) ? `${pretty(want)} is not built with these features. Choose another board, or change the features.` :
+    `${hws.length} boards have these features${q ? `, ${shown} match the search` : ''}.`;
 }
 
-function pickRelease(tag){
-  current = releases.find(r => r.tag === tag) || releases[0];
-  $('release').value = current.tag;
-  const seen = new Map();
-  for (const i of current.images) if (!seen.has(i.hw.toLowerCase())) seen.set(i.hw.toLowerCase(), i.hw);
-  hwList = [...seen.values()].sort((a, b) => a.localeCompare(b, undefined, {sensitivity:'base'}));
-}
-
-function link(i, how){
-  return `<a href="${i.url}" download>${i.name}</a> <small>${(i.size/1048576).toFixed(1)} MB · ${how}${i.sha ? ` · sha256 ${i.sha.slice(0,12)}…` : ''}</small><br>`;
+function onward(text, href, label){
+  return `<div class="card"><h2>Not one of ours</h2><p>${text}</p><a class="dl" href="${href}">${label}</a></div>`;
 }
 
 function render(){
-  save();
-  const hw = $('boards').value, clear = $('clear').checked, out = $('out');
-  if (!current){ return; }
-  if (!hw){ out.innerHTML = '<p class="muted">Choose your hardware.</p>'; return; }
-  const imgs = current.images.filter(i => i.hw.toLowerCase() === hw.toLowerCase());
-  let html = `<p class="muted"><a href="${current.html}">${current.tag}</a>${current.pre ? ' (pre-release)' : ''}</p>`;
-  for (const fl of FLAVOURS){
-    const set = imgs.filter(i => i.base === fl.base && i.features === fl.f);
-    if (!set.length) continue;
-    let files = '', note = '';
-    if (set[0].mcu.startsWith('esp32')){
-      const i = set.find(x => x.form === (clear ? 'merged' : 'bin'));
-      if (!i) continue;
-      files = link(i, clear ? 'erase, then write at 0x0' : 'write at 0x10000, keeps settings');
-    } else {
-      for (const i of set) files += link(i, i.form === 'uf2' ? 'drag onto the boot drive' : 'nRF DFU package');
-      if (clear) note = '<p class="note">These files never erase. Erase the device first (e.g. the erase option in the MeshCore web flasher), then flash.</p>';
-    }
-    html += `<div class="card"><h2>${fl.name}</h2><p class="muted">${fl.text}</p><div class="files">${files}</div>${note}</div>`;
-  }
-  out.innerHTML = html.includes('class="card"') ? html : html + '<p>No image for this board in this release.</p>';
-}
-
-async function load(){
-  let list;
-  try {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=50`);
-    if (!r.ok) throw new Error(r.status === 403 ? 'GitHub rate limit reached, try again in an hour' : `GitHub said ${r.status}`);
-    list = await r.json();
-  } catch (e) {
-    $('out').innerHTML = `<p>Could not load releases: ${e.message}. <a href="https://github.com/${REPO}/releases">All releases on GitHub</a>.</p>`;
+  writeHash();
+  const out = $('out'), {base, code, f} = wanted();
+  if (!code){
+    out.innerHTML = f.has('obs')
+      ? onward('The Observer without auto-reply or remote control is agessaman\'s firmware, published by him.', OBSERVER_HOME, 'Observer firmware')
+      : onward('Plain MeshCore, with none of these features, comes from the MeshCore project and its web flasher.', STOCK_FLASHER, 'MeshCore web flasher');
     return;
   }
-  releases = list.filter(r => !r.draft).map(r => ({
-    tag: r.tag_name, pre: r.prerelease, html: r.html_url,
-    images: r.assets.map(parse).filter(Boolean),
-  })).filter(r => r.images.length);
-  if (!releases.length){ $('out').innerHTML = '<p>No releases found.</p>'; return; }
-  for (const r of releases) $('release').add(new Option(r.tag + (r.pre ? ' (pre-release)' : ''), r.tag));
-  const s = state();
-  $('clear').checked = s.clear;
-  pickRelease(s.r);
-  fillBoards(s.hw);
-  render();
+  const hw = $('boards').value;
+  if (!hw){ out.innerHTML = '<p class="muted" style="margin-top:28px">Choose your hardware.</p>'; return; }
+  const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === code);
+  if (!set.length){ out.innerHTML = '<div class="card"><p>No image for this board with these features.</p></div>'; return; }
+  const fresh = checked('install')[0] === 'new';
+  const esp = set[0].mcu.startsWith('esp32');
+  const img = esp ? set.find(i => i.form === (fresh ? 'merged' : 'bin')) : (set.find(i => i.form === 'uf2') || set[0]);
+  const dfu = !esp && set.find(i => i.form === 'zip');
+  let how;
+  if (esp && fresh){
+    how = `<ol class="how"><li>Open the <a href="${STOCK_FLASHER}">MeshCore web flasher</a> (Chrome or Edge), or use esptool.</li>
+      <li>Erase the flash, then write this file at address <code>0x0</code>.</li></ol>`;
+  } else if (esp){
+    how = `<ol class="how"><li>Write this file at address <code>0x10000</code> with the web flasher or esptool. Settings are kept.</li>
+      ${base === 'observer' ? '<li>Or, on a node already running this firmware: <code>ota update</code> on its console fetches it over WiFi.</li>' : ''}</ol>`;
+  } else {
+    how = `<ol class="how"><li>Double-tap reset: the board shows up as a USB drive.</li><li>Copy this <code>.uf2</code> file onto it. The board restarts by itself.</li></ol>
+      ${dfu ? `<p class="hint">Over Bluetooth instead: the <a href="${dfu.url}" download>DFU package</a> (${mb(dfu.size)}) with the nRF Connect or nRF DFU app.</p>` : ''}
+      ${fresh ? '<p class="note">These files never erase. For a clean start, erase the board first, for example with the erase option in the MeshCore web flasher.</p>' : ''}`;
+  }
+  const names = {ar: 'Auto-reply', rc: 'Remote control', arrc: 'Auto-reply and remote control'};
+  out.innerHTML = `<div class="card">
+    <h2>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h2>
+    <p class="muted">${release.tag}${release.prerelease ? ' (pre-release)' : ''} · ${fresh ? 'new install' : 'update'} · <a href="${release.url}">release notes</a></p>
+    <a class="dl" href="${img.url}" download>Download (${mb(img.size)})</a>
+    <p class="file">${img.file}${img.sha256 ? `<br><small class="muted">sha256 ${img.sha256}</small>` : ''}</p>
+    ${how}</div>`;
 }
 
-$('release').onchange = () => { const keep = $('boards').value; pickRelease($('release').value); fillBoards(keep); render(); };
-$('filter').oninput = () => { fillBoards(); render(); };
-$('boards').onchange = render;
-$('clear').onchange = render;
+function update(keepBoard){ fillBoards(keepBoard); render(); }
+
+async function load(){
+  try {
+    const r = await fetch(INDEX, {cache: 'no-cache'});
+    if (!r.ok) throw new Error(`the index answered ${r.status}`);
+    index = await r.json();
+  } catch (e){
+    $('out').innerHTML = `<p>Could not load the firmware list: ${e.message}. <a href="https://github.com/sweden-mesh/MeshCore-lou/releases">All releases on GitHub</a>.</p>`;
+    return;
+  }
+  if (!index.releases.length){ $('out').innerHTML = '<p>No releases yet.</p>'; return; }
+  $('all').href = `https://github.com/${index.repo}/releases`;
+  $('gen').textContent = `List updated ${index.generated.slice(0, 16).replace('T', ' ')} UTC.`;
+  for (const r of index.releases) $('release').add(new Option(r.tag + (r.prerelease ? ' (pre-release)' : ''), r.tag));
+  const s = readHash();
+  pickRelease(s.r);
+  update(s.hw);
+}
+
+for (const i of document.querySelectorAll('input[name="f"]')){
+  i.addEventListener('change', () => {
+    // Remote control rides on the Observer's MQTT, so it brings the Observer along,
+    // and taking the Observer away takes remote control with it.
+    const f = name => document.querySelector(`input[name="f"][value="${name}"]`);
+    if (i.value === 'rc' && i.checked) f('obs').checked = true;
+    if (i.value === 'obs' && !i.checked) f('rc').checked = false;
+    update();
+  });
+}
+for (const i of document.querySelectorAll('input[name="install"]')) i.addEventListener('change', render);
+$('filter').addEventListener('input', () => update());
+$('boards').addEventListener('change', render);
+$('release').addEventListener('change', () => { pickRelease($('release').value); update(); });
 load();
 </script>
 </body>
