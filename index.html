@@ -1,109 +1,266 @@
 <!doctype html>
-<html lang="en">
+<html lang="sv">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MeshCore firmware</title>
-<meta name="description" content="Pick a MeshCore firmware with auto-reply, remote control or Observer for your board and get one file.">
+<title>lou-firmware för MeshCore</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="description" content="MeshCore-firmware från sweden-mesh med autosvar och fjärrstyrning. Välj funktioner och kort och få en fil.">
 <style>
-:root{--bg:#fff;--fg:#1b1f23;--muted:#5c6670;--line:#d8dee4;--card:#f6f8fa;--accent:#0b62d6;--accent-bg:#e8f1fd;--warn:#9a6700;--off:#8c959f}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--accent-bg:#132339;--warn:#d29922;--off:#6e7681}}
-:root[data-theme="dark"]{--bg:#0d1117;--fg:#e6edf3;--muted:#8d96a0;--line:#30363d;--card:#161b22;--accent:#4c9aff;--accent-bg:#132339;--warn:#d29922;--off:#6e7681}
+:root{
+  --bg:#f6f8f7;--surface:#fff;--fg:#14201c;--muted:#5b6b66;--line:#dfe6e3;
+  --accent:#0f766e;--accent-fg:#fff;--accent-soft:#e3f3f1;--accent-line:#9fd8d1;
+  --warn:#8a5a00;--warn-soft:#fff6e0;--off:#9aa7a2;--shadow:0 1px 2px rgb(16 32 28/.06),0 4px 16px rgb(16 32 28/.06);
+  --hero:linear-gradient(135deg,#0f766e 0%,#115e59 55%,#134e4a 100%);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c1311;--surface:#131c19;--fg:#e4ecea;--muted:#93a6a0;--line:#24322e;
+  --accent:#2dd4bf;--accent-fg:#06221e;--accent-soft:#0f2a26;--accent-line:#1f5d55;
+  --warn:#f5c060;--warn-soft:#2a2210;--off:#5c6b67;--shadow:0 1px 2px rgb(0 0 0/.3),0 4px 16px rgb(0 0 0/.25);
+  --hero:linear-gradient(135deg,#0d3d38 0%,#0b2f2b 60%,#0a2522 100%);
+}}
+:root[data-theme="dark"]{
+  --bg:#0c1311;--surface:#131c19;--fg:#e4ecea;--muted:#93a6a0;--line:#24322e;
+  --accent:#2dd4bf;--accent-fg:#06221e;--accent-soft:#0f2a26;--accent-line:#1f5d55;
+  --warn:#f5c060;--warn-soft:#2a2210;--off:#5c6b67;--shadow:0 1px 2px rgb(0 0 0/.3),0 4px 16px rgb(0 0 0/.25);
+  --hero:linear-gradient(135deg,#0d3d38 0%,#0b2f2b 60%,#0a2522 100%);
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:760px;margin:0 auto;padding:24px 16px 56px}
-h1{font-size:1.45rem;margin:0 0 4px}
-p{margin:0 0 8px}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
-.muted{color:var(--muted)}
-fieldset{border:0;padding:0;margin:28px 0 0}
-legend{font-weight:700;font-size:1.05rem;padding:0;margin-bottom:8px;display:flex;gap:10px;align-items:center}
-legend .n{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--bg);font-size:.8rem}
-.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
-.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:8px;padding:10px 12px;cursor:pointer;background:var(--bg)}
-.opt input{margin-top:4px;accent-color:var(--accent)}
-.opt:has(input:checked){border-color:var(--accent);background:var(--accent-bg)}
-.opt:has(input:disabled){cursor:not-allowed;color:var(--off)}
+code{font:.86em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--accent-soft);padding:1px 5px;border-radius:5px}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px}
+
+/* hero */
+header.hero{background:var(--hero);color:#fff;padding:44px 0 56px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin:0 0 10px}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
+.hero p{max-width:680px;margin:0 0 12px;opacity:.92}
+.hero code{background:rgb(255 255 255/.14);color:#fff}
+.hero .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-weight:600;text-decoration:none;font-size:.95rem}
+.btn-light{background:#fff;color:#0f3d39}
+.btn-ghost{color:#fff;border:1px solid rgb(255 255 255/.4)}
+.btn-ghost:hover{background:rgb(255 255 255/.08)}
+
+main{margin-top:-28px}
+section{margin-bottom:40px}
+h2{font-size:1.35rem;margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 18px}
+
+/* feature cards */
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.feature{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.feature header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.feature h3{margin:0;font-size:1.15rem}
+.tag{font:600 .75rem ui-monospace,Menlo,Consolas,monospace;color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:999px;padding:2px 8px}
+.tag.ext{color:var(--muted);background:transparent;border-color:var(--line);font-family:inherit}
+.feature dl{margin:0;display:grid;gap:10px}
+.feature dt{font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.feature dd{margin:2px 0 0;font-size:.95rem}
+.feature .more{margin-top:auto;padding-top:14px;font-weight:600;text-decoration:none}
+.feature .more:hover{text-decoration:underline}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px;margin-top:14px}
+.mini .feature{box-shadow:none;padding:16px}
+.mini .feature p{margin:0;font-size:.93rem;color:var(--muted)}
+
+/* picker */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:6px 22px 22px}
+fieldset{border:0;padding:0;margin:22px 0 0}
+legend{font-weight:700;font-size:1.02rem;padding:0;margin-bottom:10px;display:flex;gap:10px;align-items:center}
+legend .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--accent-fg);font-size:.82rem}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent-line)}
+.opt input{margin-top:4px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt:has(input:disabled){cursor:not-allowed;color:var(--off);border-style:dashed}
 .opt:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
-.opt b{display:block}
-.opt small{color:var(--muted);display:block;line-height:1.35}
+.opt b{display:block;font-size:.98rem}
+.opt small{color:var(--muted);display:block;line-height:1.4;font-size:.86rem;margin-top:2px}
 .opt:has(input:disabled) small{color:var(--off)}
-input[type=search],select{width:100%;padding:8px;font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px}
-#boards{margin-top:6px}
-.hint{font-size:.9rem;color:var(--muted);margin-top:6px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin-top:28px}
-.card h2{font-size:1.1rem;margin:0 0 6px}
-.dl{display:inline-block;margin:6px 0 4px;padding:9px 14px;border-radius:6px;background:var(--accent);color:var(--bg);text-decoration:none;font-weight:600}
-.file{word-break:break-all;font-size:.85rem}
-.note{color:var(--warn);font-size:.9rem}
-ol.how{margin:8px 0 0;padding-left:20px}
-code{font-size:.85em}
-details{margin-top:28px;font-size:.9rem}
-summary{cursor:pointer;color:var(--muted)}
-footer{margin-top:36px;font-size:.85rem;color:var(--muted)}
+input[type=search],select{width:100%;padding:10px 12px;font:inherit;color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:10px}
+input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+#boards{margin-top:8px}
+.hint{font-size:.88rem;color:var(--muted);margin:8px 0 0}
+
+/* result */
+.result{margin-top:24px;border:1.5px solid var(--accent);border-radius:14px;padding:18px 20px;background:var(--accent-soft)}
+.result.neutral{border-color:var(--line);background:transparent}
+.result h3{margin:0 0 4px;font-size:1.15rem}
+.result .meta{color:var(--muted);font-size:.9rem;margin:0 0 14px}
+.btn-main{background:var(--accent);color:var(--accent-fg)}
+.btn-main:hover{filter:brightness(1.07)}
+.file{word-break:break-all;font-size:.82rem;color:var(--muted);margin:10px 0 0}
+ol.how{margin:14px 0 0;padding-left:20px}
+ol.how li{margin:4px 0}
+.note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:12px 0 0}
+#cfg label.field{display:block;font-weight:600;font-size:.95rem;margin:4px 0 12px}
+#cfg label.field select,#cfg label.field input{margin-top:6px;font-weight:400}
+#cfg input[type=text]{width:100%;padding:10px 12px;font:.9rem ui-monospace,Menlo,Consolas,monospace;color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:10px}
+#cfg input[type=text]:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+#cfg input.bad{border-color:#c2410c}
+pre.cmds{margin:6px 0 0;padding:14px 16px;border-radius:12px;background:#0f1a17;color:#d7f3ee;font:.88rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
+.cmd-row{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.copy{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:9px;padding:6px 12px;font:600 .85rem system-ui,sans-serif;cursor:pointer}
+.copy:hover{border-color:var(--accent)}
+details.ver{margin-top:18px;font-size:.9rem}
+details.ver summary{cursor:pointer;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;color:var(--muted)}
+@media (max-width:520px){.panel{padding:4px 14px 16px}.feature{padding:16px}}
 </style>
 </head>
 <body>
-<main>
-<h1>MeshCore firmware</h1>
-<p class="muted">Choose what your node should do and which board it runs on. You get one file and how to flash it.</p>
-
-<fieldset id="s-type">
-  <legend><span class="n">1</span>Type of node</legend>
-  <div class="opts">
-    <label class="opt"><input type="radio" name="type" value="repeater" checked><span><b>Repeater</b><small>A fixed node that relays traffic for others.</small></span></label>
-    <label class="opt"><input type="radio" name="type" value="companion" disabled><span><b>Companion</b><small>The radio you pair with the app. Comes with auto-scope.</small></span></label>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">sweden-mesh</p>
+    <h1>lou-firmware för MeshCore</h1>
+    <p>lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla kort som har plats.</p>
+    <p>Varje version heter efter MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-15</code>.</p>
+    <div class="links">
+      <a class="btn btn-light" href="#valj">Hitta din fil</a>
+      <a class="btn btn-ghost" href="https://github.com/sweden-mesh/MeshCore-lou#readme">Läs mer i README</a>
+    </div>
   </div>
-</fieldset>
+</header>
 
-<fieldset id="s-features">
-  <legend><span class="n">2</span>Features</legend>
-  <div class="opts">
-    <label class="opt"><input type="checkbox" name="f" value="obs"><span><b>Observer</b><small>Reports what it hears to an MQTT server such as meshat.se. WiFi boards only.</small></span></label>
-    <label class="opt"><input type="checkbox" name="f" value="ar" checked><span><b>Auto-reply</b><small>Answers <code>test</code> on the regional test channel with a signal report, so the mesh can measure itself.</small></span></label>
-    <label class="opt"><input type="checkbox" name="f" value="rc"><span><b>Remote control</b><small>Takes signed commands and updates over MQTT. Needs Observer.</small></span></label>
-    <label class="opt"><input type="checkbox" name="f" value="as" disabled><span><b>Auto-scope</b><small>Sets the region scope automatically. Coming.</small></span></label>
+<main class="wrap">
+<section aria-labelledby="h-funktioner" style="margin-top:56px">
+  <h2 id="h-funktioner">Funktionerna</h2>
+  <p class="sub">Välj bara det du behöver. Varje funktion är avstängd tills nodens ägare slår på den.</p>
+  <div class="features">
+    <article class="feature">
+      <header><h3>Autosvar</h3><span class="tag">ar</span></header>
+      <dl>
+        <dt>Problemet</dt>
+        <dd>Det är svårt att veta hur väl meshet hänger ihop: vem som hör vem, och hur starkt. Att fråga runt för hand säger lite och mäter bara där du råkar stå.</dd>
+        <dt>Så löser vi det</dt>
+        <dd>En repeater som hör <code>test</code> på länets testkanal, till exempel <code>#test-se-jkp</code>, svarar med hur starkt den hörde dig, hur många hopp meddelandet tog och vilka repeatrar det passerade. Kanalen följer nodens standardregion, och svaren sprids ut över ett par minuter och hålls inom länet.</dd>
+        <dt>Att tänka på</dt>
+        <dd>Varje svar kostar sändningstid för alla i närheten, så svaren är begränsade per avsändare och totalt. En nod utan standardregion (<code>region default</code>) svarar inte.</dd>
+      </dl>
+      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/autoreply.md">Dokumentation om autosvar →</a>
+    </article>
+    <article class="feature">
+      <header><h3>Fjärrstyrning</h3><span class="tag">rc</span></header>
+      <dl>
+        <dt>Problemet</dt>
+        <dd>En repeater sitter ofta på ett tak eller i en mast. Att ändra en inställning betyder en resa dit, eller en inloggning över meshet som kostar sändningstid.</dd>
+        <dt>Så löser vi det</dt>
+        <dd>Ägaren skickar kommandon via nodens MQTT-anslutning, signerade med en nyckel bara ägaren har. Noden kör ett kommando bara om signaturen stämmer, och nodens identitet, radio och nyckel går aldrig att ändra på distans.</dd>
+        <dt>Att tänka på</dt>
+        <dd>Kräver Observer och wifi, och noden nås bara när MQTT-servern gör det. Tappar du nyckeln kan du inte längre styra noden på distans. Nyckeln läggs in via kabel.</dd>
+      </dl>
+      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/mqtt-control.md">Dokumentation om fjärrstyrning →</a>
+    </article>
   </div>
-</fieldset>
-
-<fieldset id="s-install">
-  <legend><span class="n">3</span>Installation</legend>
-  <div class="opts">
-    <label class="opt"><input type="radio" name="install" value="update" checked><span><b>Install</b><small>Keeps the node's settings and identity.</small></span></label>
-    <label class="opt"><input type="radio" name="install" value="new"><span><b>Clear flash</b><small>Erases everything, settings included.</small></span></label>
+  <div class="mini">
+    <article class="feature">
+      <header><h3>Observer</h3><span class="tag ext">agessaman</span></header>
+      <p>Skickar det noden hör till en MQTT-server, till exempel meshat.se. Kräver wifi. Våra Observer-filer uppdaterar sig själva över wifi, med signerade uppdateringar. <a href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/ota.md">Om uppdateringarna</a> · <a href="https://observer.gessaman.com/">Observer-firmware</a></p>
+    </article>
+    <article class="feature">
+      <header><h3>Auto-scope</h3><span class="tag ext">kommer</span></header>
+      <p>Ställer in nodens region automatiskt, för repeatrar och för companions. Inte klar än.</p>
+    </article>
   </div>
-</fieldset>
+</section>
 
-<fieldset id="s-hw">
-  <legend><span class="n">4</span>Hardware</legend>
-  <input id="filter" type="search" placeholder="Search, e.g. heltec v3" autocomplete="off" aria-label="Search hardware">
-  <select id="boards" size="9" aria-label="Hardware"></select>
-  <p id="hw-hint" class="hint"></p>
-</fieldset>
+<section id="valj" aria-labelledby="h-valj">
+  <h2 id="h-valj">Hitta din fil</h2>
+  <p class="sub">Fyra val, sedan får du en fil och hur du flashar den.</p>
+  <div class="panel">
+    <fieldset id="s-type">
+      <legend><span class="n">1</span>Typ av nod</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="type" value="repeater" checked><span><b>Repeater</b><small>En fast nod som vidarebefordrar trafik åt andra.</small></span></label>
+        <label class="opt"><input type="radio" name="type" value="companion" disabled><span><b>Companion</b><small>Radion du parar med appen. Kommer med auto-scope.</small></span></label>
+      </div>
+    </fieldset>
 
-<div id="out" aria-live="polite"><p class="muted">Loading…</p></div>
+    <fieldset id="s-features">
+      <legend><span class="n">2</span>Funktioner</legend>
+      <div class="opts">
+        <label class="opt"><input type="checkbox" name="f" value="obs"><span><b>Observer</b><small>Skickar det noden hör till MQTT, till exempel meshat.se. Bara kort med wifi.</small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="ar" checked><span><b>Autosvar</b><small>Svarar på <code>test</code> på länets testkanal med en signalrapport.</small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="rc"><span><b>Fjärrstyrning</b><small>Signerade kommandon via MQTT. Kräver Observer.</small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="as" disabled><span><b>Auto-scope</b><small>Ställer in regionen automatiskt. Kommer.</small></span></label>
+      </div>
+    </fieldset>
 
-<details id="adv">
-  <summary>Release</summary>
-  <p style="margin-top:8px"><select id="release" aria-label="Release"></select></p>
-  <p class="muted">The newest full release is chosen by default. All files are in the <a id="all" href="#">releases on GitHub</a>.</p>
-</details>
+    <fieldset id="s-install">
+      <legend><span class="n">3</span>Installation</legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="install" value="update" checked><span><b>Uppdatera</b><small>Behåller nodens inställningar och identitet.</small></span></label>
+        <label class="opt"><input type="radio" name="install" value="new"><span><b>Ny installation</b><small>Rensar flashminnet. Allt raderas, inställningar också.</small></span></label>
+      </div>
+    </fieldset>
 
-<footer>Built by sweden-mesh from <a href="https://github.com/sweden-mesh/MeshCore-lou">MeshCore-lou</a>, on <a href="https://github.com/meshcore-dev/MeshCore">MeshCore</a> and <a href="https://github.com/agessaman/MeshCore">agessaman's Observer</a>. <span id="gen"></span></footer>
+    <fieldset id="s-hw">
+      <legend><span class="n">4</span>Hårdvara</legend>
+      <input id="filter" type="search" placeholder="Sök, t.ex. heltec v3" autocomplete="off" aria-label="Sök hårdvara">
+      <select id="boards" size="9" aria-label="Hårdvara"></select>
+      <p id="hw-hint" class="hint"></p>
+    </fieldset>
+
+    <div id="out" aria-live="polite"><p class="hint">Läser in…</p></div>
+
+    <fieldset id="cfg" hidden>
+      <legend><span class="n">5</span>Inställningar</legend>
+      <p class="hint" style="margin:0 0 12px">Efter flashningen: kör kommandona ett i taget i nodens konsol över USB, till exempel i MeshCores webbflashare under <i>Console</i>. Vänta på svaret innan du skickar nästa.</p>
+      <div id="cfg-ar">
+        <label class="field">Län<select id="lan"></select></label>
+        <p class="hint" id="lan-hint" style="margin:-4px 0 12px"></p>
+      </div>
+      <div id="cfg-rc">
+        <label class="field">Din kommandonyckel, den publika halvan (64 hextecken)
+          <input type="text" id="pubkey" autocomplete="off" spellcheck="false" maxlength="64" placeholder="t.ex. 38A263C4…" aria-describedby="pubkey-hint"></label>
+        <p class="hint" id="pubkey-hint" style="margin:-4px 0 12px">Nyckeln kan bara läggas in via kabel. Den hemliga halvan behåller du själv och lämnar aldrig ut.</p>
+      </div>
+      <div class="cmd-row"><b>Kommandon</b><button type="button" class="copy" id="copy">Kopiera</button></div>
+      <pre class="cmds" id="cmds"></pre>
+    </fieldset>
+
+    <details class="ver">
+      <summary>Version</summary>
+      <p style="margin:10px 0 6px"><select id="release" aria-label="Version"></select></p>
+      <p class="hint">Den senaste fullständiga versionen väljs om du inte väljer en annan. Alla filer finns bland <a id="all" href="https://github.com/sweden-mesh/MeshCore-lou/releases">versionerna på GitHub</a>.</p>
+    </details>
+  </div>
+</section>
 </main>
+
+<footer>
+  <div class="wrap">Byggt av sweden-mesh från <a href="https://github.com/sweden-mesh/MeshCore-lou">MeshCore-lou</a>, på <a href="https://github.com/meshcore-dev/MeshCore">MeshCore</a> och <a href="https://github.com/agessaman/MeshCore">agessamans Observer</a>. <span id="gen"></span></div>
+</footer>
+
 <script>
 const INDEX = 'index.json';
 const STOCK_FLASHER = 'https://flasher.meshcore.co.uk/';
 const OBSERVER_HOME = 'https://observer.gessaman.com/';
+
+const REGION_LIST = 'https://raw.githubusercontent.com/zombiefredrik/meshcore-se-regioner/main/data/regioner.csv';
+const COUNTIES = [
+  ['01', 'Stockholms län'], ['03', 'Uppsala län'], ['04', 'Södermanlands län'], ['05', 'Östergötlands län'],
+  ['06', 'Jönköpings län'], ['07', 'Kronobergs län'], ['08', 'Kalmar län'], ['09', 'Gotlands län'],
+  ['10', 'Blekinge län'], ['12', 'Skåne län'], ['13', 'Hallands län'], ['14', 'Västra Götalands län'],
+  ['17', 'Värmlands län'], ['18', 'Örebro län'], ['19', 'Västmanlands län'], ['20', 'Dalarnas län'],
+  ['21', 'Gävleborgs län'], ['22', 'Västernorrlands län'], ['23', 'Jämtlands län'], ['24', 'Västerbottens län'],
+  ['25', 'Norrbottens län'],
+];
+// A county's region: the name it has decided itself in zombiefredrik/meshcore-se-regioner
+// (beslut lokalt), otherwise its SCB code -- the same rule as meshat.se's setup wizards.
+const chosenNames = new Map();
+const countyScope = code => chosenNames.get(code) || 'se' + code;
 
 const $ = id => document.getElementById(id);
 const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
 let index = null, release = null;
 
 function pretty(hw){ const s = hw.replace(/_/g, ' '); return s[0].toUpperCase() + s.slice(1); }
-function mb(n){ return (n / 1048576).toFixed(1) + ' MB'; }
+function mb(n){ return (n / 1048576).toLocaleString('sv-SE', {maximumFractionDigits: 1}) + ' MB'; }
 
-// The features ticked, as the image's base and feature code; null when no image of ours fits.
+// The features ticked, as the image's base and feature code; an empty code when no image of ours fits.
 function wanted(){
   const f = new Set(checked('f'));
   const base = f.has('obs') ? 'observer' : 'core';
@@ -118,6 +275,7 @@ function readHash(){
     for (const i of document.querySelectorAll('input[name="f"]')) i.checked = !i.disabled && f.includes(i.value);
   }
   if (h.get('install') === 'new') document.querySelector('input[name="install"][value="new"]').checked = true;
+  if (COUNTIES.some(([c]) => c === h.get('lan'))) $('lan').value = h.get('lan');
   return {hw: h.get('hw'), r: h.get('r')};
 }
 function writeHash(){
@@ -125,6 +283,7 @@ function writeHash(){
   h.set('f', checked('f').join(','));
   h.set('install', checked('install')[0]);
   if ($('boards').value) h.set('hw', $('boards').value);
+  if ($('lan').value) h.set('lan', $('lan').value);
   if (release && index && release !== index.releases[0]) h.set('r', release.tag);
   history.replaceState(null, '', '#' + h);
 }
@@ -140,7 +299,7 @@ function fillBoards(keep){
   const q = $('filter').value.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
   const sel = $('boards'), want = keep || sel.value;
   const hws = [...new Set(release.images.filter(i => i.base === base && i.features === code).map(i => i.hw))]
-    .sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
+    .sort((a, b) => a.localeCompare(b, 'sv', {sensitivity: 'base'}));
   sel.innerHTML = '';
   let group = null, shown = 0;
   for (const hw of hws){
@@ -148,7 +307,7 @@ function fillBoards(keep){
     const maker = hw.split('_')[0].toLowerCase();
     if (!group || group.dataset.maker !== maker){
       group = document.createElement('optgroup');
-      group.label = hw.split('_')[0];
+      group.label = pretty(hw.split('_')[0]);
       group.dataset.maker = maker;
       sel.add(group);
     }
@@ -158,50 +317,82 @@ function fillBoards(keep){
     shown++;
   }
   $('hw-hint').textContent = !hws.length ? '' :
-    want && !hws.includes(want) ? `${pretty(want)} is not built with these features. Choose another board, or change the features.` :
-    `${hws.length} boards have these features${q ? `, ${shown} match the search` : ''}.`;
+    want && !hws.includes(want) ? `${pretty(want)} finns inte med de här funktionerna. Välj ett annat kort eller andra funktioner.` :
+    `${hws.length} kort har de här funktionerna${q ? `, ${shown} matchar sökningen` : ''}.`;
 }
 
 function onward(text, href, label){
-  return `<div class="card"><h2>Not one of ours</h2><p>${text}</p><a class="dl" href="${href}">${label}</a></div>`;
+  return `<div class="result neutral"><h3>Inte vår firmware</h3><p class="meta">${text}</p><a class="btn btn-main" href="${href}">${label}</a></div>`;
 }
 
 function render(){
+  renderResult();
+  renderConfig();
+}
+
+function renderResult(){
   writeHash();
   const out = $('out'), {base, code, f} = wanted();
   if (!code){
     out.innerHTML = f.has('obs')
-      ? onward('The Observer without auto-reply or remote control is agessaman\'s firmware, published by them.', OBSERVER_HOME, 'Observer firmware')
-      : onward('Plain MeshCore, with none of these features, comes from the MeshCore project and its web flasher.', STOCK_FLASHER, 'MeshCore web flasher');
+      ? onward('Observer utan autosvar eller fjärrstyrning är agessamans firmware, som de själva ger ut.', OBSERVER_HOME, 'Observer-firmware')
+      : onward('Vanlig MeshCore, utan de här funktionerna, kommer från MeshCore-projektet och deras webbflashare.', STOCK_FLASHER, 'MeshCores webbflashare');
     return;
   }
   const hw = $('boards').value;
-  if (!hw){ out.innerHTML = '<p class="muted" style="margin-top:28px">Choose your hardware.</p>'; return; }
+  if (!hw){ out.innerHTML = '<div class="result neutral"><p class="meta" style="margin:0">Välj din hårdvara.</p></div>'; return; }
   const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === code);
-  if (!set.length){ out.innerHTML = '<div class="card"><p>No image for this board with these features.</p></div>'; return; }
+  if (!set.length){ out.innerHTML = '<div class="result neutral"><p class="meta" style="margin:0">Det finns ingen fil för det här kortet med de här funktionerna.</p></div>'; return; }
   const fresh = checked('install')[0] === 'new';
   const esp = set[0].mcu.startsWith('esp32');
   const img = esp ? set.find(i => i.form === (fresh ? 'merged' : 'bin')) : (set.find(i => i.form === 'uf2') || set[0]);
   const dfu = !esp && set.find(i => i.form === 'zip');
   let how;
   if (esp && fresh){
-    how = `<ol class="how"><li>Open the <a href="${STOCK_FLASHER}">MeshCore web flasher</a> (Chrome or Edge), or use esptool.</li>
-      <li>Erase the flash, then write this file at address <code>0x0</code>.</li></ol>`;
+    how = `<ol class="how"><li>Öppna <a href="${STOCK_FLASHER}">MeshCores webbflashare</a> (Chrome eller Edge), eller använd esptool.</li>
+      <li>Radera flashminnet och skriv sedan filen på adress <code>0x0</code>.</li></ol>`;
   } else if (esp){
-    how = `<ol class="how"><li>Write this file at address <code>0x10000</code> with the web flasher or esptool. Settings are kept.</li>
-      ${base === 'observer' ? '<li>Or, on a node already running this firmware: <code>ota update</code> on its console fetches it over WiFi.</li>' : ''}</ol>`;
+    how = `<ol class="how"><li>Skriv filen på adress <code>0x10000</code> med webbflasharen eller esptool. Inställningarna finns kvar.</li>
+      ${base === 'observer' ? '<li>Eller, på en nod som redan kör den här firmwaren: <code>ota update</code> i nodens konsol hämtar den över wifi.</li>' : ''}</ol>`;
   } else {
-    how = `<ol class="how"><li>Double-tap reset: the board shows up as a USB drive.</li><li>Copy this <code>.uf2</code> file onto it. The board restarts by itself.</li></ol>
-      ${dfu ? `<p class="hint">Over Bluetooth instead: the <a href="${dfu.url}" download>DFU package</a> (${mb(dfu.size)}) with the nRF Connect or nRF DFU app.</p>` : ''}
-      ${fresh ? '<p class="note">These files never erase. For a clean start, erase the board first, for example with the erase option in the MeshCore web flasher.</p>' : ''}`;
+    how = `<ol class="how"><li>Dubbelklicka på reset: kortet dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
+      ${dfu ? `<p class="hint">Via Bluetooth i stället: <a href="${dfu.url}" download>DFU-paketet</a> (${mb(dfu.size)}) med appen nRF Connect eller nRF DFU.</p>` : ''}
+      ${fresh ? '<p class="note">De här filerna raderar aldrig något. Radera kortet först för en ren start, till exempel med raderingen i MeshCores webbflashare.</p>' : ''}`;
   }
-  const names = {ar: 'Auto-reply', rc: 'Remote control', arrc: 'Auto-reply and remote control'};
-  out.innerHTML = `<div class="card">
-    <h2>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h2>
-    <p class="muted">${release.tag}${release.prerelease ? ' (pre-release)' : ''} · ${fresh ? 'clear flash' : 'install'} · <a href="${release.url}">release notes</a></p>
-    <a class="dl" href="${img.url}" download>Download (${mb(img.size)})</a>
-    <p class="file">${img.file}${img.sha256 ? `<br><small class="muted">sha256 ${img.sha256}</small>` : ''}</p>
+  const names = {ar: 'Autosvar', rc: 'Fjärrstyrning', arrc: 'Autosvar och fjärrstyrning'};
+  out.innerHTML = `<div class="result">
+    <h3>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h3>
+    <p class="meta">${release.tag}${release.prerelease ? ' (förhandsversion)' : ''} · ${fresh ? 'ny installation' : 'uppdatering'} · <a href="${release.url}">versionsinformation</a></p>
+    <a class="btn btn-main" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>
+    <p class="file">${img.file}${img.sha256 ? `<br>sha256 ${img.sha256}` : ''}</p>
     ${how}</div>`;
+}
+
+// Step 5: the console commands for the features chosen, after flashing.
+function renderConfig(){
+  const {code} = wanted();
+  const ready = code && $('boards').value && !$('out').querySelector('.neutral');
+  $('cfg').hidden = !ready;
+  if (!ready) return;
+  const ar = code.includes('ar'), rc = code.includes('rc');
+  $('cfg-ar').hidden = !ar;
+  $('cfg-rc').hidden = !rc;
+  const lines = [];
+  if (ar){
+    const lan = $('lan').value;
+    const scope = lan ? countyScope(lan) : '<län>';
+    $('lan-hint').innerHTML = lan
+      ? `Noden får <code>${scope}</code> som standardregion och svarar på <code>#test-${scope}</code>. Har du redan satt regionen med meshat.se:s guide räcker <code>set autoreply on</code>.`
+      : 'Välj länet repeatern står i.';
+    lines.push(`region put ${scope}`, `region default ${scope}`, 'region save', 'set autoreply on');
+  }
+  if (rc){
+    const key = $('pubkey').value.trim();
+    const ok = /^[0-9a-fA-F]{64}$/.test(key);
+    $('pubkey').classList.toggle('bad', key !== '' && !ok);
+    lines.push(`set mqtt.cmd.pubkey ${ok ? key.toUpperCase() : '<din nyckel>'}`, 'set mqtt.cmd on', 'reboot');
+  }
+  $('cmds').textContent = lines.join('\n');
 }
 
 function update(keepBoard){ fillBoards(keepBoard); render(); }
@@ -209,20 +400,40 @@ function update(keepBoard){ fillBoards(keepBoard); render(); }
 async function load(){
   try {
     const r = await fetch(INDEX, {cache: 'no-cache'});
-    if (!r.ok) throw new Error(`the index answered ${r.status}`);
+    if (!r.ok) throw new Error(`listan svarade ${r.status}`);
     index = await r.json();
   } catch (e){
-    $('out').innerHTML = `<p>Could not load the firmware list: ${e.message}. <a href="https://github.com/sweden-mesh/MeshCore-lou/releases">All releases on GitHub</a>.</p>`;
+    $('out').innerHTML = `<p class="hint">Kunde inte läsa in listan med filer: ${e.message}. <a href="https://github.com/sweden-mesh/MeshCore-lou/releases">Alla versioner på GitHub</a>.</p>`;
     return;
   }
-  if (!index.releases.length){ $('out').innerHTML = '<p>No releases yet.</p>'; return; }
+  if (!index.releases.length){ $('out').innerHTML = '<p class="hint">Inga versioner än.</p>'; return; }
   $('all').href = `https://github.com/${index.repo}/releases`;
-  $('gen').textContent = `List updated ${index.generated.slice(0, 16).replace('T', ' ')} UTC.`;
-  for (const r of index.releases) $('release').add(new Option(r.tag + (r.prerelease ? ' (pre-release)' : ''), r.tag));
+  $('gen').textContent = `Listan uppdaterades ${index.generated.slice(0, 16).replace('T', ' ')} UTC.`;
+  for (const r of index.releases) $('release').add(new Option(r.tag + (r.prerelease ? ' (förhandsversion)' : ''), r.tag));
   const s = readHash();
   pickRelease(s.r);
   update(s.hw);
+  loadCountyNames();
 }
+
+async function loadCountyNames(){
+  try {
+    const r = await fetch(REGION_LIST);
+    if (!r.ok) return;
+    const [head, ...rows] = (await r.text()).split(/\r?\n/);
+    const col = Object.fromEntries(head.split(',').map((c, i) => [c.trim(), i]));
+    for (const row of rows){
+      const c = row.split(',').map(x => x.trim());
+      if (c[col.beslut] === 'lokalt' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(c[col.region] || '')) chosenNames.set(c[col.scb_lan], c[col.region]);
+    }
+  } catch {
+    // Without the list every county gets its SCB code, which every county accepts.
+  }
+  renderConfig();
+}
+
+$('lan').add(new Option('Välj län …', ''));
+for (const [code, name] of COUNTIES) $('lan').add(new Option(name, code));
 
 for (const i of document.querySelectorAll('input[name="f"]')){
   i.addEventListener('change', () => {
@@ -235,6 +446,13 @@ for (const i of document.querySelectorAll('input[name="f"]')){
   });
 }
 for (const i of document.querySelectorAll('input[name="install"]')) i.addEventListener('change', render);
+$('lan').addEventListener('change', render);
+$('pubkey').addEventListener('input', renderConfig);
+$('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText($('cmds').textContent); $('copy').textContent = 'Kopierat'; }
+  catch { $('copy').textContent = 'Markera och kopiera'; }
+  setTimeout(() => { $('copy').textContent = 'Kopiera'; }, 1500);
+});
 $('filter').addEventListener('input', () => update());
 $('boards').addEventListener('change', render);
 $('release').addEventListener('change', () => { pickRelease($('release').value); update(); });

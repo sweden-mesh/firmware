@@ -1,6 +1,6 @@
 # firmware
 
-One static page that leads to the right MeshCore firmware image from
+One static page, in Swedish, that leads to the right MeshCore firmware image from
 [sweden-mesh/MeshCore-lou](https://github.com/sweden-mesh/MeshCore-lou/releases): type of node,
 then features (Observer, auto-reply, remote control, later auto-scope), install or clear flash,
 then the board. The answer is one file and how to flash it.
@@ -15,6 +15,11 @@ then the board. The answer is one file and how to flash it.
 
 The binaries stay in the releases and are downloaded from there. The page cannot flash a board
 itself: GitHub's release downloads cannot be read by another site's page.
+
+After the file, step 5 writes the console commands for the features chosen: the county's
+region and `set autoreply on` for auto-reply (the county's own name from
+[zombiefredrik/meshcore-se-regioner](https://github.com/zombiefredrik/meshcore-se-regioner) when it
+has decided one, otherwise its SCB code), and the command key for remote control.
 
 Choices with no image of ours lead onward: no features to MeshCore's web flasher, the Observer
 alone to agessaman's Observer firmware.
