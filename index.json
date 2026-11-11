@@ -1,6 +1,6 @@
 {
  "repo": "sweden-mesh/MeshCore-lou",
- "generated": "2026-11-10T15:02:22Z",
+ "generated": "2026-11-11T18:52:47Z",
  "releases": [
   {
    "tag": "v1.18.0-lou-15",
@@ -4987,7 +4987,8 @@
      "size": 724992,
      "sha256": "d7d453cadfa4744894139fb01934b95697ce745009d97036136dd2a30f3be35a"
     }
-   ]
+   ],
+   "hosted": "fw/v1.18.0-lou-15/"
   },
   {
    "tag": "v1.17.1-lou-14",

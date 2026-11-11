@@ -33,7 +33,7 @@ jobs:
       - name: Which release is hosted
         id: release
         run: |
-          tag=$(python3 -c 'import json; print(next(r["tag"] for r in json.load(open("index.json"))["releases"] if not r["prerelease"]))')
+          tag=$(python3 -c 'import json; print(next(r["tag"] for r in json.load(open("index.json"))["releases"] if r.get("hosted")))')
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "hosting $tag"
 

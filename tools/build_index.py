@@ -7,6 +7,8 @@ The page reads this file instead of GitHub's API, so a visitor makes one request
 this site and is never rate limited. GITHUB_TOKEN, when set, raises the API limit for
 this script; the releases are public either way.
 
+The latest full release gets "hosted": "fw/<tag>/", where the site serves its ESP32 images.
+
 Image names: <board>-<mcu>-v<x.y.z>-lou-<nn>-<features>-<hash>[-merged].<ext>, and the
 older -ar-<nn>-<hash> names, which carried every feature.
 """
@@ -75,6 +77,11 @@ def main():
                 })
         page += 1
     releases.sort(key=lambda r: r["published"] or "", reverse=True)
+    # The site hosts the ESP32 images of one release, the latest full one, next to the page
+    # (deploy.yml); the page offers to flash only the images of the release marked here.
+    hosted = next((r for r in releases if not r["prerelease"]), None)
+    if hosted:
+        hosted["hosted"] = f"fw/{hosted['tag']}/"
     json.dump({
         "repo": REPO,
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
