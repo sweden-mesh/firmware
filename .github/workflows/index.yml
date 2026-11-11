@@ -10,12 +10,16 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency: index
 
 jobs:
   index:
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
     steps:
       - uses: actions/checkout@v4
       - name: Build index.json
@@ -23,6 +27,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 tools/build_index.py sweden-mesh/MeshCore-lou > index.json.new
       - name: Commit when the releases changed
+        id: commit
         run: |
           # The generation time changes on every run; only the releases decide a commit.
           strip() { python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); d.pop("generated"); print(json.dumps(d, sort_keys=True))' "$1"; }
@@ -35,3 +40,10 @@ jobs:
           git add index.json
           git commit -m "index: the releases of sweden-mesh/MeshCore-lou"
           git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  # A push made with this workflow's token starts no other workflow, so call the deploy.
+  deploy:
+    needs: index
+    if: needs.index.outputs.changed == 'true'
+    uses: ./.github/workflows/deploy.yml
