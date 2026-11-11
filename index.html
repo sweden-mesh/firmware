@@ -235,6 +235,11 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
       <pre class="cmds" id="cmds"></pre>
     </fieldset>
 
+    <fieldset id="done" hidden>
+      <legend><span class="n">6</span>Klart</legend>
+      <p id="done-text" style="margin:0"></p>
+    </fieldset>
+
     <details class="ver">
       <summary>Version</summary>
       <p style="margin:10px 0 6px"><select id="release" aria-label="Version"></select></p>
@@ -413,7 +418,7 @@ function renderResult(){
 function renderConfig(){
   const {code} = wanted();
   const ready = code && $('boards').value && !$('out').querySelector('.neutral');
-  $('cfg').hidden = !ready;
+  $('cfg').hidden = $('done').hidden = !ready;
   if (!ready) return;
   const ar = code.includes('ar'), rc = code.includes('rc');
   $('cfg-ar').hidden = !ar;
@@ -434,6 +439,10 @@ function renderConfig(){
     lines.push(`set mqtt.cmd.pubkey ${ok ? key.toUpperCase() : '<din nyckel>'}`, 'set mqtt.cmd on', 'reboot');
   }
   $('cmds').textContent = lines.join('\n');
+  const channel = ar && $('lan').value ? `#test-${countyScope($('lan').value)}` : '#test-&lt;län&gt;';
+  $('done-text').innerHTML = 'Grattis, nu är du klar! ' + (ar
+    ? `Se om det fungerar genom att skicka <code>test</code> i kanalen <code>${channel}</code>. Svaret kan dröja ett par minuter, så ha tålamod. Noden svarar samma avsändare högst en gång per fem minuter.`
+    : 'Se om det fungerar genom att skicka ett kommando till noden med <a href="https://github.com/sweden-mesh/mccontrol">mccontrol</a>.');
 }
 
 function update(keepBoard){ fillBoards(keepBoard); render(); }
