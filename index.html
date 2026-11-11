@@ -399,7 +399,8 @@ function renderResult(){
       <li>Radera flashminnet och skriv sedan filen på adress <code>0x0</code>.</li></ol>`;
   } else if (esp){
     how = `<ol class="how"><li>Skriv filen på adress <code>0x10000</code> med <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">webbflasharen</a> eller esptool. Inställningarna finns kvar.</li>
-      ${base === 'observer' ? '<li>Eller, på en nod som redan kör den här firmwaren: <code>ota update</code> i nodens konsol hämtar den över wifi.</li>' : ''}</ol>`;
+      ${base === 'observer' ? '<li>Eller, på en nod som redan kör den här firmwaren: <code>ota update</code> i nodens konsol hämtar den över wifi.</li>' : ''}</ol>
+      <p class="note">Visar <code>ver</code> fortfarande den gamla versionen? Noden har då uppdaterats över wifi någon gång och startar från sin andra programplats. Kör <code>esptool.py --chip ${mcu} erase_region 0xe000 0x2000</code> och starta om: den startar då filen du just skrev. Inställningarna finns kvar.</p>`;
   } else {
     how = `<ol class="how"><li>Dubbelklicka på reset: kortet dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
       ${dfu ? `<p class="hint">Via Bluetooth i stället: <a href="${dfu.url}" download>DFU-paketet</a> (${mb(dfu.size)}) med appen nRF Connect eller nRF DFU.</p>` : ''}
