@@ -94,6 +94,18 @@ input[type=search]:focus,select:focus{outline:2px solid var(--accent);outline-of
 .file{word-break:break-all;font-size:.82rem;color:var(--muted);margin:10px 0 0}
 ol.how{margin:14px 0 0;padding-left:20px}
 ol.how li{margin:4px 0}
+.flash{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.flash .hint{flex-basis:100%;margin:2px 0 0}
+.btn-quiet{border:1.5px solid var(--accent-line);color:var(--accent);background:transparent}
+button.btn{border:1.5px solid transparent;cursor:pointer;font-family:inherit}
+button.btn:disabled{opacity:.55;cursor:default}
+#flash-run{flex-basis:100%}
+#flash-run progress{width:100%;height:10px;accent-color:var(--accent)}
+.flash-step{margin:6px 0 0;font-size:.92rem}
+.flash-step.ok{color:var(--accent);font-weight:600}
+.flash-step.bad{color:#c2410c;font-weight:600}
+.flash-log summary{cursor:pointer;font-size:.85rem;color:var(--muted)}
+.flash-log pre{max-height:180px;overflow:auto;font-size:.78rem;margin:6px 0 0;white-space:pre-wrap}
 .note{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 12px;font-size:.9rem;margin:12px 0 0}
 #cfg label.field{display:block;font-weight:600;font-size:.95rem;margin:4px 0 12px}
 #cfg label.field select,#cfg label.field input{margin-top:6px;font-weight:400}
@@ -294,6 +306,7 @@ const countyScope = code => chosenNames.get(code) || 'se' + code;
 const $ = id => document.getElementById(id);
 const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
 let index = null, release = null;
+let flashing = false;   // while a board is written, the result box stays as it is
 
 function pretty(hw){ const s = hw.replace(/_/g, ' '); return s[0].toUpperCase() + s.slice(1); }
 function mb(n){ return (n / 1048576).toLocaleString('sv-SE', {maximumFractionDigits: 1}) + ' MB'; }
@@ -369,6 +382,7 @@ function render(){
 }
 
 function renderResult(){
+  if (flashing) return;
   writeHash();
   const out = $('out'), {base, code, f} = wanted();
   if (!code){
@@ -410,9 +424,51 @@ function renderResult(){
   out.innerHTML = `<div class="result">
     <h3>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h3>
     <p class="meta">${release.tag}${release.prerelease ? ' (förhandsversion)' : ''} · ${fresh ? 'ny installation' : 'uppdatering'} · <a href="${release.url}">versionsinformation</a></p>
-    <a class="btn btn-main" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>
+    ${canFlash(img) ? `<div class="flash"><button type="button" class="btn btn-main" id="flash-btn">Flasha via USB</button>
+      <a class="btn btn-quiet" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>
+      <p class="hint">Anslut kortet med USB-kabel och tryck på <b>Flasha via USB</b>: webbläsaren frågar vilken port. ${fresh ? 'Hela flashminnet raderas först.' : 'Inställningarna finns kvar.'}</p>
+      <div id="flash-run" hidden><progress id="flash-bar" max="1" value="0"></progress><p id="flash-step" class="flash-step"></p>
+      <details class="flash-log"><summary>Logg</summary><pre id="flash-log"></pre></details></div></div>`
+    : `<a class="btn btn-main" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>`}
     <p class="file">${img.file}${img.sha256 ? `<br>sha256 ${img.sha256}` : ''}</p>
     ${how}</div>`;
+  if (canFlash(img)) $('flash-btn').onclick = () => startFlash(img, fresh);
+}
+
+// The page flashes ESP32 images of the release hosted next to it, in browsers with Web Serial.
+// Until it has been tested on real boards it shows only with ?flasha in the address.
+const FLASH_TRIAL = new URLSearchParams(location.search).has('flasha');
+function canFlash(img){
+  return FLASH_TRIAL && img.mcu.startsWith('esp32') && release.hosted && 'serial' in navigator;
+}
+
+async function startFlash(img, fresh){
+  let port;
+  try { port = await navigator.serial.requestPort(); } catch { return; }   // the user closed the picker
+  const btn = $('flash-btn'), step = $('flash-step'), bar = $('flash-bar'), log = $('flash-log');
+  flashing = true;
+  const locked = [...document.querySelectorAll('#valj input, #valj select')].filter(e => !e.disabled);
+  btn.disabled = true;
+  locked.forEach(e => e.disabled = true);
+  $('flash-run').hidden = false;
+  step.className = 'flash-step';
+  log.textContent = '';
+  try {
+    const {flash} = await import('./flasher.js');
+    await flash({port, img, url: release.hosted + img.file, fresh,
+      onStep: t => step.textContent = t,
+      onProgress: f => bar.value = f,
+      onLog: l => log.textContent += l + '\n'});
+    step.textContent = 'Klart. Kortet startar om med den nya firmwaren: kontrollera med ver i konsolen.';
+    step.classList.add('ok');
+  } catch (e){
+    step.textContent = e.message || String(e);
+    step.classList.add('bad');
+  } finally {
+    flashing = false;
+    btn.disabled = false;
+    locked.forEach(e => e.disabled = false);
+  }
 }
 
 // Step 5: the console commands for the features chosen, after flashing.
