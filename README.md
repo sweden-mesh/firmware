@@ -38,9 +38,10 @@ https://sweden-mesh.github.io/firmware/?flasha. Other chips and browsers get the
 and written steps, as do older releases.
 
 After the file, step 5 writes the console commands for the features chosen: the county's
-region and `set autoreply on` for auto-reply (the county's own name from
-[zombiefredrik/meshcore-se-regioner](https://github.com/zombiefredrik/meshcore-se-regioner) when it
-has decided one, otherwise its SCB code), and the command key for remote control.
+region and `set autoreply on` for auto-reply, and the command key for remote control. The
+region comes from [zombiefredrik/meshcore-se-regioner](https://github.com/zombiefredrik/meshcore-se-regioner):
+the name the county decided (`lokalt`), else the name measured in use (`uppmatt`), else the
+list's proposal (`forslag`); the SCB code only if the list cannot be read.
 
 Choices with no image of ours lead onward: no features to MeshCore's web flasher, the Observer
 alone to agessaman's Observer firmware.

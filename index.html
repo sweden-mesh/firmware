@@ -298,9 +298,10 @@ const COUNTIES = [
   ['21', 'Gävleborgs län'], ['22', 'Västernorrlands län'], ['23', 'Jämtlands län'], ['24', 'Västerbottens län'],
   ['25', 'Norrbottens län'],
 ];
-// A county's region: the name it has decided itself in zombiefredrik/meshcore-se-regioner
-// (beslut lokalt), otherwise its SCB code -- the same rule as meshat.se's setup wizards.
-const chosenNames = new Map();
+// A county's region, from zombiefredrik/meshcore-se-regioner: the name it decided itself
+// (beslut lokalt), else the name measured in use on the air (uppmatt), else the list's
+// proposal (forslag). Its SCB code only when the list cannot be read or has no valid name.
+const chosenNames = new Map(), nameStatus = new Map();
 const countyScope = code => chosenNames.get(code) || 'se' + code;
 
 const $ = id => document.getElementById(id);
@@ -485,7 +486,11 @@ function renderConfig(){
     const lan = $('lan').value;
     const scope = lan ? countyScope(lan) : '<län>';
     $('lan-hint').innerHTML = lan
-      ? `Noden får <code>${scope}</code> som standardregion och svarar på <code>#test-${scope}</code>. Har du redan satt regionen med meshat.se:s guide räcker <code>set autoreply on</code>.`
+      ? `Noden får <code>${scope}</code> som standardregion och svarar på <code>#test-${scope}</code>. ${{
+          lokalt: 'Länet har bestämt namnet själv.',
+          uppmatt: 'Namnet är det som används mest i länet, uppmätt i trafiken.',
+          forslag: 'Namnet är ett förslag: länet har inte bestämt något och ingen variant används av en majoritet än.',
+        }[nameStatus.get(lan)] || ''} Har noden redan en standardregion, till exempel från meshat.se:s guide, räcker <code>set autoreply on</code>: den svarar då på <code>#test-</code> plus den regionen.`
       : 'Välj länet repeatern står i.';
     lines.push(`region put ${scope}`, `region default ${scope}`, 'region save', 'set autoreply on');
   }
@@ -531,7 +536,8 @@ async function loadCountyNames(){
     const col = Object.fromEntries(head.split(',').map((c, i) => [c.trim(), i]));
     for (const row of rows){
       const c = row.split(',').map(x => x.trim());
-      if (c[col.beslut] === 'lokalt' && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(c[col.region] || '')) chosenNames.set(c[col.scb_lan], c[col.region]);
+      if (['lokalt', 'uppmatt', 'forslag'].includes(c[col.beslut]) && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(c[col.region] || '') && c[col.region].length <= 29)
+        chosenNames.set(c[col.scb_lan], c[col.region]), nameStatus.set(c[col.scb_lan], c[col.beslut]);
     }
   } catch {
     // Without the list every county gets its SCB code, which every county accepts.
