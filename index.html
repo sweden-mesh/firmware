@@ -158,9 +158,9 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
         <dt>Problemet</dt>
         <dd>Det är svårt att veta hur väl meshet hänger ihop: vem som hör vem, och hur starkt. Att fråga runt för hand säger lite och mäter bara där du råkar stå.</dd>
         <dt>Så löser vi det</dt>
-        <dd>En repeater som hör <code>test</code> på länets testkanal, till exempel <code>#test-se-jkp</code>, svarar med hur starkt den hörde dig, hur många hopp meddelandet tog och vilka repeatrar det passerade. Kanalen följer nodens standardregion, och svaren sprids ut över ett par minuter och hålls inom länet.</dd>
+        <dd>En repeater som hör <code>test</code> på länets testkanal, till exempel <code>#test-se-jkp</code>, svarar med hur starkt den hörde dig, hur många hopp meddelandet tog och vilka repeatrar det passerade. Kanalen följer nodens hemregion (<code>region home</code>), och svaren sprids ut över ett par minuter och hålls inom länet.</dd>
         <dt>Att tänka på</dt>
-        <dd>Varje svar kostar sändningstid för alla i närheten, så svaren är begränsade per avsändare och totalt. En nod utan standardregion (<code>region default</code>) svarar inte.</dd>
+        <dd>Varje svar kostar sändningstid för alla i närheten, så svaren är begränsade per avsändare och totalt. En nod utan hemregion svarar inte, om den inte har länet som standardregion.</dd>
       </dl>
       <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/autoreply.md">Dokumentation om autosvar →</a>
     </article>
@@ -486,13 +486,13 @@ function renderConfig(){
     const lan = $('lan').value;
     const scope = lan ? countyScope(lan) : '<län>';
     $('lan-hint').innerHTML = lan
-      ? `Noden får <code>${scope}</code> som standardregion och svarar på <code>#test-${scope}</code>. ${{
+      ? `Noden får <code>${scope}</code> som hemregion och svarar på <code>#test-${scope}</code>. Standardregionen blir <code>se</code>, så att repeaterns adverts når hela Sverige. ${{
           lokalt: 'Länet har bestämt namnet själv.',
           uppmatt: 'Namnet är det som används mest i länet, uppmätt i trafiken.',
           forslag: 'Namnet är ett förslag: länet har inte bestämt något och ingen variant används av en majoritet än.',
-        }[nameStatus.get(lan)] || ''} Har noden redan en standardregion, till exempel från meshat.se:s guide, räcker <code>set autoreply on</code>: den svarar då på <code>#test-</code> plus den regionen.`
+        }[nameStatus.get(lan)] || ''} Har noden redan länet som hemregion, till exempel från meshat.se:s guide, räcker <code>set autoreply on</code>.`
       : 'Välj länet repeatern står i.';
-    lines.push(`region put ${scope}`, `region default ${scope}`, 'region save', 'set autoreply on');
+    lines.push(`region put ${scope}`, 'region put se', `region home ${scope}`, 'region default se', 'region save', 'set autoreply on');
   }
   if (rc){
     const key = $('pubkey').value.trim();
