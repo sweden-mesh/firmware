@@ -33,15 +33,15 @@ export function parsePartitions(bytes){
 }
 
 // What an update may do on a board with this table: write an image of `size` bytes at
-// 0x10000, and erase otadata if there is one. Throws, in Swedish, when it may not.
-export function updatePlan(parts, size){
+// 0x10000, and erase otadata if there is one. Throws when it may not, in the words of t(key, vars).
+export function updatePlan(parts, size, t){
   if (!parts.length)
-    throw new Error('Kortet har ingen partitionstabell som går att läsa. Välj "Ny installation".');
+    throw new Error(t('fl.notable'));
   const app = parts.find(p => p.type === 0 && p.offset === APP0);
   if (!app)
-    throw new Error('Kortet har ingen programplats på 0x10000: det kör något annat än MeshCore. Välj "Ny installation".');
+    throw new Error(t('fl.noapp'));
   if (size > app.size)
-    throw new Error(`Filen (${size} byte) får inte plats i kortets programplats (${app.size} byte). Välj "Ny installation".`);
+    throw new Error(t('fl.toobig', {size, app: app.size}));
   const ota = parts.find(p => p.type === 1 && p.subtype === 0);
   return {otadata: ota ? {offset: ota.offset, size: ota.size} : null};
 }
@@ -57,35 +57,35 @@ export async function sha256(bytes){
   return Array.from(d, b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function fetchImage(url, expected, onStep){
-  onStep('Hämtar filen…');
+async function fetchImage(url, expected, onStep, t){
+  onStep(t('fl.fetch'));
   const r = await fetch(url, {cache: 'no-cache'});
-  if (!r.ok) throw new Error(`Filen kunde inte hämtas (${r.status}).`);
+  if (!r.ok) throw new Error(t('fl.fetch.fail', {status: r.status}));
   const bytes = new Uint8Array(await r.arrayBuffer());
-  onStep('Kontrollerar filen…');
-  if (await sha256(bytes) !== expected) throw new Error('Filen stämmer inte med sin kontrollsumma. Inget har skrivits.');
+  onStep(t('fl.check'));
+  if (await sha256(bytes) !== expected) throw new Error(t('fl.sha'));
   return bytes;
 }
 
 // Flashes `img` (a row of index.json) from `url`. `fresh` is a new install. `port` comes
 // from navigator.serial.requestPort(), which must be called from the click itself.
-// onStep(text), onProgress(fraction), onLog(line).
-export async function flash({port, img, url, fresh, onStep, onProgress, onLog}){
+// onStep(text), onProgress(fraction), onLog(line); t(key, vars) gives the page's text for a key.
+export async function flash({port, img, url, fresh, onStep, onProgress, onLog, t}){
   const {ESPLoader, Transport} = await import(ESPTOOL);
   const want = chipName(img.mcu);
-  const image = await fetchImage(url, img.sha256, onStep);
+  const image = await fetchImage(url, img.sha256, onStep, t);
   const terminal = {clean(){}, writeLine: l => onLog(l), write: l => onLog(l)};
   const transport = new Transport(port, false);
   try {
-    onStep('Ansluter till kortet…');
+    onStep(t('fl.connect'));
     const loader = new ESPLoader({transport, baudrate: BAUD, terminal});
     try {
       await loader.main();
     } catch (e){
-      throw new Error('Kortet svarar inte. Håll ned BOOT, tryck på RESET, släpp BOOT och försök igen.');
+      throw new Error(t('fl.noanswer'));
     }
     const have = loader.chip.CHIP_NAME;
-    if (have !== want) throw new Error(`Kortet har en ${have}, filen är för en ${want}. Inget har skrivits. Kontrollera att du valt rätt hårdvara.`);
+    if (have !== want) throw new Error(t('fl.chip', {have, want}));
 
     let files;
     if (fresh){
@@ -93,16 +93,16 @@ export async function flash({port, img, url, fresh, onStep, onProgress, onLog}){
       const bytes = size ? loader.flashSizeBytes(size) : 0;
       const needs = mergedNeeds(image);
       if (bytes && needs > bytes)
-        throw new Error(`Filen behöver ${needs / 1048576} MB flashminne, kortet har ${bytes / 1048576} MB. Inget har skrivits. Kontrollera att du valt rätt hårdvara.`);
+        throw new Error(t('fl.size', {needs: needs / 1048576, has: bytes / 1048576}));
       files = [{data: image, address: 0}];
     } else {
-      onStep('Läser kortets partitionstabell…');
-      const plan = updatePlan(parsePartitions(await loader.readFlash(TABLE, TABLE_SIZE)), image.length);
+      onStep(t('fl.table'));
+      const plan = updatePlan(parsePartitions(await loader.readFlash(TABLE, TABLE_SIZE)), image.length, t);
       files = [{data: image, address: APP0}];
       if (plan.otadata) files.push({data: new Uint8Array(plan.otadata.size).fill(0xff), address: plan.otadata.offset});
     }
 
-    onStep(fresh ? 'Raderar flashminnet och skriver…' : 'Skriver…');
+    onStep(t(fresh ? 'fl.erasewrite' : 'fl.write'));
     const total = files.reduce((n, f) => n + f.data.length, 0);
     const before = files.map((f, i) => files.slice(0, i).reduce((n, g) => n + g.data.length, 0));
     await loader.writeFlash({
@@ -111,7 +111,7 @@ export async function flash({port, img, url, fresh, onStep, onProgress, onLog}){
       reportProgress: (i, written, size) => onProgress((before[i] + written / size * files[i].data.length) / total),
     });
     onProgress(1);
-    onStep('Startar om kortet…');
+    onStep(t('fl.restart'));
     await loader.after('hard_reset');
   } finally {
     await transport.disconnect().catch(() => {});

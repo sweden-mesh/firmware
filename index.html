@@ -6,6 +6,9 @@
 <title>lou-firmware för MeshCore</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M9 22l7-12 7 12' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <meta name="description" content="MeshCore-firmware från sweden-mesh med autosvar och fjärrstyrning. Välj funktioner och kort och få en fil.">
+<link rel="alternate" hreflang="sv" href="https://sweden-mesh.github.io/firmware/?lang=sv">
+<link rel="alternate" hreflang="en" href="https://sweden-mesh.github.io/firmware/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://sweden-mesh.github.io/firmware/">
 <style>
 :root{
   --bg:#f6f8f7;--surface:#fff;--fg:#14201c;--muted:#5b6b66;--line:#dfe6e3;
@@ -33,7 +36,12 @@ code{font:.86em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:
 
 /* hero */
 header.hero{background:var(--hero);color:#fff;padding:44px 0 56px}
-.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin:0 0 10px}
+.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin:0}
+.hero .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 10px}
+.langs{display:flex;gap:4px;font-size:.88rem}
+.langs a{color:#fff;opacity:.78;text-decoration:none;padding:6px 8px;border-radius:6px}
+.langs a:hover{opacity:1;background:rgb(255 255 255/.08)}
+.langs a[aria-current]{opacity:1;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .hero h1{font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
 .hero p{max-width:680px;margin:0 0 12px;opacity:.92}
 .hero code{background:rgb(255 255 255/.14);color:#fff}
@@ -136,126 +144,132 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 <body>
 <header class="hero">
   <div class="wrap">
-    <p class="eyebrow">sweden-mesh</p>
-    <h1>lou-firmware för MeshCore</h1>
-    <p>lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla enheter som har plats.</p>
-    <p>Varje version heter som MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-15</code>.</p>
+    <div class="top">
+      <p class="eyebrow">sweden-mesh</p>
+      <nav class="langs" id="langs" data-i18n-label="lang.label">
+        <a href="?lang=sv" hreflang="sv" lang="sv" data-lang="sv">Svenska</a>
+        <a href="?lang=en" hreflang="en" lang="en" data-lang="en">English</a>
+      </nav>
+    </div>
+    <h1 data-i18n="hero.h1"></h1>
+    <p data-i18n="hero.p1"></p>
+    <p data-i18n="hero.p2"></p>
     <div class="links">
-      <a class="btn btn-light" href="#valj">Hitta din fil</a>
-      <a class="btn btn-ghost" href="https://github.com/sweden-mesh/MeshCore-lou#readme">Läs mer i README</a>
+      <a class="btn btn-light" href="#valj" data-i18n="hero.find"></a>
+      <a class="btn btn-ghost" href="https://github.com/sweden-mesh/MeshCore-lou#readme" data-i18n="hero.readme"></a>
     </div>
   </div>
 </header>
 
 <main class="wrap">
 <section aria-labelledby="h-funktioner" style="margin-top:56px">
-  <h2 id="h-funktioner">Funktionerna</h2>
-  <p class="sub">Välj bara det du behöver. Varje funktion är avstängd tills nodens ägare slår på den.</p>
+  <h2 id="h-funktioner" data-i18n="feat.h"></h2>
+  <p class="sub" data-i18n="feat.sub"></p>
   <div class="features">
     <article class="feature">
-      <header><h3>Autosvar</h3><span class="tag">ar</span></header>
+      <header><h3 data-i18n="feat.ar.h"></h3><span class="tag">ar</span></header>
       <dl>
-        <dt>Problemet</dt>
-        <dd>Det är svårt att veta hur väl meshet hänger ihop: vem som hör vem, och hur starkt. Att fråga runt för hand säger lite och mäter bara där du råkar stå.</dd>
-        <dt>Så löser vi det</dt>
-        <dd>En repeater som hör <code>test</code> på länets testkanal, till exempel <code>#test-se-jkp</code>, svarar med hur starkt den hörde dig, hur många hopp meddelandet tog och vilka repeatrar det passerade. Kanalen följer nodens hemregion (<code>region home</code>), och svaren sprids ut över ett par minuter och hålls inom länet.</dd>
-        <dt>Att tänka på</dt>
-        <dd>Varje svar kostar sändningstid för alla i närheten, så svaren är begränsade per avsändare och totalt. En nod utan hemregion svarar inte, om den inte har länet som standardregion.</dd>
+        <dt data-i18n="feat.problem"></dt>
+        <dd data-i18n="feat.ar.problem"></dd>
+        <dt data-i18n="feat.solution"></dt>
+        <dd data-i18n="feat.ar.solution"></dd>
+        <dt data-i18n="feat.mind"></dt>
+        <dd data-i18n="feat.ar.mind"></dd>
       </dl>
-      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/autoreply.md">Dokumentation om autosvar →</a>
+      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/autoreply.md" data-i18n="feat.ar.more"></a>
     </article>
     <article class="feature">
-      <header><h3>Fjärrstyrning</h3><span class="tag">rc</span></header>
+      <header><h3 data-i18n="feat.rc.h"></h3><span class="tag">rc</span></header>
       <dl>
-        <dt>Problemet</dt>
-        <dd>Den som har flera repeatrar utspridda över ett stort område, på tak och i master långt från varandra, måste i dag åka till var och en eller logga in på dem en i taget över meshet för att ändra en inställning. Det tar tid, och varje inloggning kostar sändningstid.</dd>
-        <dt>Så löser vi det</dt>
-        <dd>Ägaren skickar kommandon via nodens MQTT-anslutning, signerade med en nyckel bara ägaren har. Noden kör ett kommando bara om signaturen stämmer, och nodens identitet, radio och nyckel går aldrig att ändra på distans.</dd>
-        <dt>Att tänka på</dt>
-        <dd>Kräver Observer och wifi, och noden nås bara när MQTT-servern gör det. Tappar du nyckeln kan du inte längre styra noden på distans. Nyckeln läggs in via kabel, och kommandona skickas med <a href="https://github.com/sweden-mesh/mccontrol">mccontrol</a>.</dd>
+        <dt data-i18n="feat.problem"></dt>
+        <dd data-i18n="feat.rc.problem"></dd>
+        <dt data-i18n="feat.solution"></dt>
+        <dd data-i18n="feat.rc.solution"></dd>
+        <dt data-i18n="feat.mind"></dt>
+        <dd data-i18n="feat.rc.mind"></dd>
       </dl>
-      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/mqtt-control.md">Dokumentation om fjärrstyrning →</a>
+      <a class="more" href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/mqtt-control.md" data-i18n="feat.rc.more"></a>
     </article>
   </div>
   <div class="mini">
     <article class="feature">
       <header><h3>Observer</h3><span class="tag ext">agessaman</span></header>
-      <p>Skickar det noden hör till en MQTT-server, till exempel meshat.se. Kräver wifi. Våra Observer-filer uppdaterar sig själva över wifi, med signerade uppdateringar. <a href="https://github.com/sweden-mesh/MeshCore-lou/blob/fork/observer/docs/ota.md">Om uppdateringarna</a> · <a href="https://observer.gessaman.com/">Observer-firmware</a></p>
+      <p data-i18n="feat.obs.p"></p>
     </article>
     <article class="feature">
       <header><h3>Auto-scope</h3><span class="tag">as</span></header>
-      <p>Ställer in nodens region automatiskt, för repeatrar och för companions. Kommer snart.</p>
+      <p data-i18n="feat.as.p"></p>
     </article>
   </div>
 </section>
 
 <section id="valj" aria-labelledby="h-valj">
-  <h2 id="h-valj">Hitta din fil</h2>
-  <p class="sub">Fyra val, sedan får du en fil och hur du flashar den.</p>
+  <h2 id="h-valj" data-i18n="pick.h"></h2>
+  <p class="sub" data-i18n="pick.sub"></p>
   <div class="panel">
     <fieldset id="s-type">
-      <legend><span class="n">1</span>Typ av nod</legend>
+      <legend><span class="n">1</span><span data-i18n="pick.type"></span></legend>
       <div class="opts">
-        <label class="opt"><input type="radio" name="type" value="repeater" checked><span><b>Repeater</b><small>En fast nod som vidarebefordrar trafik åt andra.</small></span></label>
-        <label class="opt"><input type="radio" name="type" value="companion" disabled><span><b>Companion</b><small>Radion du parar med appen. Kommer med auto-scope.</small></span></label>
+        <label class="opt"><input type="radio" name="type" value="repeater" checked><span><b>Repeater</b><small data-i18n="opt.repeater"></small></span></label>
+        <label class="opt"><input type="radio" name="type" value="companion" disabled><span><b>Companion</b><small data-i18n="opt.companion"></small></span></label>
       </div>
     </fieldset>
 
     <fieldset id="s-features">
-      <legend><span class="n">2</span>Funktioner</legend>
+      <legend><span class="n">2</span><span data-i18n="pick.features"></span></legend>
       <div class="opts">
-        <label class="opt"><input type="checkbox" name="f" value="obs"><span><b>Observer</b><small>Skickar det noden hör till MQTT, till exempel meshat.se. Bara kort med wifi.</small></span></label>
-        <label class="opt"><input type="checkbox" name="f" value="ar" checked><span><b>Autosvar</b><small>Svarar på <code>test</code> på länets testkanal med en signalrapport.</small></span></label>
-        <label class="opt"><input type="checkbox" name="f" value="rc"><span><b>Fjärrstyrning</b><small>Signerade kommandon via MQTT. Kräver Observer.</small></span></label>
-        <label class="opt"><input type="checkbox" name="f" value="as" disabled><span><b>Auto-scope</b><small>Ställer in regionen automatiskt. Kommer.</small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="obs"><span><b>Observer</b><small data-i18n="opt.obs"></small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="ar" checked><span><b data-i18n="opt.ar.b"></b><small data-i18n="opt.ar"></small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="rc"><span><b data-i18n="opt.rc.b"></b><small data-i18n="opt.rc"></small></span></label>
+        <label class="opt"><input type="checkbox" name="f" value="as" disabled><span><b>Auto-scope</b><small data-i18n="opt.as"></small></span></label>
       </div>
     </fieldset>
 
     <fieldset id="s-install">
-      <legend><span class="n">3</span>Installation</legend>
+      <legend><span class="n">3</span><span data-i18n="pick.install"></span></legend>
       <div class="opts">
-        <label class="opt"><input type="radio" name="install" value="update" checked><span><b>Uppdatera</b><small>Behåller nodens inställningar och identitet.</small></span></label>
-        <label class="opt"><input type="radio" name="install" value="new"><span><b>Ny installation</b><small>Rensar flashminnet. Allt raderas, inställningar också.</small></span></label>
+        <label class="opt"><input type="radio" name="install" value="update" checked><span><b data-i18n="opt.update.b"></b><small data-i18n="opt.update"></small></span></label>
+        <label class="opt"><input type="radio" name="install" value="new"><span><b data-i18n="opt.new.b"></b><small data-i18n="opt.new"></small></span></label>
       </div>
     </fieldset>
 
     <fieldset id="s-hw">
-      <legend><span class="n">4</span>Hårdvara</legend>
-      <input id="filter" type="search" placeholder="Sök, t.ex. heltec v3" autocomplete="off" aria-label="Sök hårdvara">
-      <select id="boards" size="9" aria-label="Hårdvara"></select>
+      <legend><span class="n">4</span><span data-i18n="pick.hw"></span></legend>
+      <input id="filter" type="search" data-i18n-ph="hw.search" data-i18n-label="hw.search.label" autocomplete="off">
+      <select id="boards" size="9" data-i18n-label="pick.hw"></select>
       <p id="hw-hint" class="hint"></p>
     </fieldset>
 
-    <div id="out" aria-live="polite"><p class="hint">Läser in…</p></div>
+    <div id="out" aria-live="polite"><p class="hint" data-i18n="loading"></p></div>
 
     <fieldset id="cfg" hidden>
-      <legend><span class="n">5</span>Inställningar</legend>
-      <p class="hint" style="margin:0 0 12px">Efter flashningen: kör kommandona ett i taget i nodens konsol över USB, till exempel i MeshCores webbflashare under <i>Console</i>. Vänta på svaret innan du skickar nästa.</p>
+      <legend><span class="n">5</span><span data-i18n="cfg.h"></span></legend>
+      <p class="hint" style="margin:0 0 12px" data-i18n="cfg.intro"></p>
       <div id="cfg-ar">
-        <label class="field">Län<select id="lan"></select></label>
+        <label class="field"><span data-i18n="cfg.county"></span><select id="lan"></select></label>
         <p class="hint" id="lan-hint" style="margin:-4px 0 12px"></p>
       </div>
       <div id="cfg-rc">
-        <label class="field" for="pubkey">Din kommandonyckel, den publika halvan (64 hextecken)</label>
+        <label class="field" for="pubkey" data-i18n="cfg.key.label"></label>
         <div class="key-row">
-          <input type="text" id="pubkey" autocomplete="off" spellcheck="false" maxlength="64" placeholder="t.ex. 38A263C4…" aria-describedby="pubkey-hint">
-          <button type="button" class="copy" id="genkey">Generera ny</button>
+          <input type="text" id="pubkey" autocomplete="off" spellcheck="false" maxlength="64" data-i18n-ph="cfg.key.ph" aria-describedby="pubkey-hint">
+          <button type="button" class="copy" id="genkey" data-i18n="cfg.key.gen"></button>
         </div>
-        <p class="hint" id="pubkey-hint" style="margin:8px 0 12px">Nyckeln kan bara läggas in via kabel. Den hemliga halvan behåller du själv och lämnar aldrig ut.</p>
+        <p class="hint" id="pubkey-hint" style="margin:8px 0 12px" data-i18n="cfg.key.hint"></p>
       </div>
-      <div class="cmd-row"><b>Kommandon</b><button type="button" class="copy" id="copy">Kopiera</button></div>
+      <div class="cmd-row"><b data-i18n="cfg.cmds"></b><button type="button" class="copy" id="copy" data-i18n="copy"></button></div>
       <pre class="cmds" id="cmds"></pre>
     </fieldset>
 
     <fieldset id="done" hidden>
-      <legend><span class="n">6</span>Klart</legend>
+      <legend><span class="n">6</span><span data-i18n="done.h"></span></legend>
       <p id="done-text" style="margin:0"></p>
     </fieldset>
 
     <details class="ver">
-      <summary>Version</summary>
-      <p style="margin:10px 0 6px"><select id="release" aria-label="Version"></select></p>
-      <p class="hint">Den senaste fullständiga versionen väljs om du inte väljer en annan. Alla filer finns bland <a id="all" href="https://github.com/sweden-mesh/MeshCore-lou/releases">versionerna på GitHub</a>.</p>
+      <summary data-i18n="ver.h"></summary>
+      <p style="margin:10px 0 6px"><select id="release" data-i18n-label="ver.h"></select></p>
+      <p class="hint"><span data-i18n="ver.hint"></span><a id="all" href="https://github.com/sweden-mesh/MeshCore-lou/releases" data-i18n="ver.all"></a>.</p>
     </details>
   </div>
 </section>
@@ -263,26 +277,28 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 
 <dialog class="keydlg" id="keydlg" aria-labelledby="keydlg-h">
   <div class="body">
-    <h3 id="keydlg-h">Din nya privata nyckel</h3>
-    <p>Spara den nu. Den visas bara den här gången, och den skapades här i din webbläsare: den har inte skickats någonstans.</p>
+    <h3 id="keydlg-h" data-i18n="key.h"></h3>
+    <p data-i18n="key.p"></p>
     <div class="secret" id="seed"></div>
     <ul>
-      <li>Lägg in den i <a href="https://github.com/sweden-mesh/mccontrol" target="_blank" rel="noopener"><b>mccontrol</b></a>, verktyget du skickar kommandona med: importera den som nyckel (<i>Import a seed</i>), eller spara den som filen <code>~/.config/mccontrol/key.seed</code>.</li>
-      <li>Den som har nyckeln kan styra dina noder. Dela den aldrig och lägg den inte i något repo.</li>
-      <li>Tappar du den kan du inte längre styra noderna på distans, bara lägga in en ny nyckel via kabel.</li>
-      <li>Den publika halvan är redan ifylld i fältet, och kommandona har uppdaterats.</li>
+      <li data-i18n="key.li1"></li>
+      <li data-i18n="key.li2"></li>
+      <li data-i18n="key.li3"></li>
+      <li data-i18n="key.li4"></li>
     </ul>
   </div>
   <div class="actions">
-    <button type="button" class="copy" id="seed-copy">Kopiera</button>
-    <button type="button" class="copy" id="seed-save">Spara som fil</button>
-    <button type="button" class="btn btn-main" id="seed-done">Jag har sparat den</button>
+    <button type="button" class="copy" id="seed-copy" data-i18n="copy"></button>
+    <button type="button" class="copy" id="seed-save" data-i18n="key.save"></button>
+    <button type="button" class="btn btn-main" id="seed-done" data-i18n="key.done"></button>
   </div>
 </dialog>
 
 <footer>
-  <div class="wrap">Byggt av sweden-mesh från <a href="https://github.com/sweden-mesh/MeshCore-lou">MeshCore-lou</a>, på <a href="https://github.com/meshcore-dev/MeshCore">MeshCore</a> och <a href="https://github.com/agessaman/MeshCore">agessamans Observer</a>. Regionala sidor: <a href="https://meshcore-jkp.se/">MeshCore i Jönköping</a>. <span id="gen"></span></div>
+  <div class="wrap"><span data-i18n="footer"></span> <span id="gen"></span></div>
 </footer>
+
+<script src="strings.js"></script>
 
 <script>
 const INDEX = 'index.json';
@@ -290,14 +306,9 @@ const STOCK_FLASHER = 'https://meshcore.io/flasher';
 const OBSERVER_HOME = 'https://observer.gessaman.com/';
 
 const REGION_LIST = 'https://raw.githubusercontent.com/zombiefredrik/meshcore-se-regioner/main/data/regioner.csv';
-const COUNTIES = [
-  ['01', 'Stockholms län'], ['03', 'Uppsala län'], ['04', 'Södermanlands län'], ['05', 'Östergötlands län'],
-  ['06', 'Jönköpings län'], ['07', 'Kronobergs län'], ['08', 'Kalmar län'], ['09', 'Gotlands län'],
-  ['10', 'Blekinge län'], ['12', 'Skåne län'], ['13', 'Hallands län'], ['14', 'Västra Götalands län'],
-  ['17', 'Värmlands län'], ['18', 'Örebro län'], ['19', 'Västmanlands län'], ['20', 'Dalarnas län'],
-  ['21', 'Gävleborgs län'], ['22', 'Västernorrlands län'], ['23', 'Jämtlands län'], ['24', 'Västerbottens län'],
-  ['25', 'Norrbottens län'],
-];
+// The SCB codes of the counties; their names are county.<code> in strings.js.
+const COUNTIES = ['01', '03', '04', '05', '06', '07', '08', '09', '10', '12', '13', '14',
+                  '17', '18', '19', '20', '21', '22', '23', '24', '25'];
 // A county's region, from zombiefredrik/meshcore-se-regioner: the name it decided itself
 // (beslut lokalt), else the name measured in use on the air (uppmatt), else the list's
 // proposal (forslag). Its SCB code only when the list cannot be read or has no valid name.
@@ -309,8 +320,42 @@ const checked = name => [...document.querySelectorAll(`input[name="${name}"]:che
 let index = null, release = null;
 let flashing = false;   // while a board is written, the result box stays as it is
 
+// The language: ?lang= in the address, else the visitor's last choice, else the browser's.
+// All text is in strings.js, one table per language.
+const LANGS = ['sv', 'en'];
+function savedLang(){ try { return localStorage.getItem('lang'); } catch { return null; } }
+function saveLang(l){ try { localStorage.setItem('lang', l); } catch {} }
+let lang = [new URLSearchParams(location.search).get('lang'), savedLang(),
+            /^sv\b/i.test(navigator.language || '') ? 'sv' : 'en'].find(l => LANGS.includes(l));
+const t = (key, vars) => translate(lang, key, vars);
+
+function applyStrings(){
+  document.documentElement.lang = lang;
+  document.title = t('title');
+  document.querySelector('meta[name="description"]').content = t('meta.description');
+  for (const e of document.querySelectorAll('[data-i18n]')) e.innerHTML = t(e.dataset.i18n);
+  for (const e of document.querySelectorAll('[data-i18n-ph]')) e.placeholder = t(e.dataset.i18nPh);
+  for (const e of document.querySelectorAll('[data-i18n-label]')) e.setAttribute('aria-label', t(e.dataset.i18nLabel));
+  for (const a of document.querySelectorAll('#langs a')){
+    if (a.dataset.lang === lang) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+  }
+  fillCounties();
+  if (index) fillReleases();
+}
+
+// The switch keeps the choice, and puts it in the address so that a shared link keeps it too.
+function setLang(l){
+  lang = l;
+  saveLang(l);
+  const u = new URL(location.href);
+  u.searchParams.set('lang', l);
+  history.replaceState(null, '', u);
+  applyStrings();
+  if (index) update();
+}
+
 function pretty(hw){ const s = hw.replace(/_/g, ' '); return s[0].toUpperCase() + s.slice(1); }
-function mb(n){ return (n / 1048576).toLocaleString('sv-SE', {maximumFractionDigits: 1}) + ' MB'; }
+function mb(n){ return (n / 1048576).toLocaleString(lang === 'sv' ? 'sv-SE' : 'en-GB', {maximumFractionDigits: 1}) + ' MB'; }
 
 // The features ticked, as the image's base and feature code; an empty code when no image of ours fits.
 function wanted(){
@@ -327,7 +372,7 @@ function readHash(){
     for (const i of document.querySelectorAll('input[name="f"]')) i.checked = !i.disabled && f.includes(i.value);
   }
   if (h.get('install') === 'new') document.querySelector('input[name="install"][value="new"]').checked = true;
-  if (COUNTIES.some(([c]) => c === h.get('lan'))) $('lan').value = h.get('lan');
+  if (COUNTIES.includes(h.get('lan'))) $('lan').value = h.get('lan');
   return {hw: h.get('hw'), r: h.get('r')};
 }
 function writeHash(){
@@ -369,12 +414,12 @@ function fillBoards(keep){
     shown++;
   }
   $('hw-hint').textContent = !hws.length ? '' :
-    want && !hws.includes(want) ? `${pretty(want)} finns inte med de här funktionerna. Välj ett annat kort eller andra funktioner.` :
-    `${hws.length} kort har de här funktionerna${q ? `, ${shown} matchar sökningen` : ''}.`;
+    want && !hws.includes(want) ? t('hw.missing', {board: pretty(want)}) :
+    t(q ? 'hw.count.match' : 'hw.count', {n: hws.length, m: shown});
 }
 
 function onward(text, href, label){
-  return `<div class="result neutral"><h3>Inte vår firmware</h3><p class="meta">${text}</p><a class="btn btn-main" href="${href}">${label}</a></div>`;
+  return `<div class="result neutral"><h3>${t('res.onward')}</h3><p class="meta">${text}</p><a class="btn btn-main" href="${href}">${label}</a></div>`;
 }
 
 function render(){
@@ -388,14 +433,14 @@ function renderResult(){
   const out = $('out'), {base, code, f} = wanted();
   if (!code){
     out.innerHTML = f.has('obs')
-      ? onward('Observer utan autosvar eller fjärrstyrning är agessamans firmware, som de själva ger ut.', OBSERVER_HOME, 'Observer-firmware')
-      : onward('Vanlig MeshCore, utan de här funktionerna, kommer från MeshCore-projektet och deras webbflashare.', STOCK_FLASHER, 'MeshCores webbflashare');
+      ? onward(t('res.onward.obs'), OBSERVER_HOME, t('res.onward.obs.link'))
+      : onward(t('res.onward.stock'), STOCK_FLASHER, t('res.onward.stock.link'));
     return;
   }
   const hw = $('boards').value;
-  if (!hw){ out.innerHTML = '<div class="result neutral"><p class="meta" style="margin:0">Välj din hårdvara.</p></div>'; return; }
+  if (!hw){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${t('res.pickhw')}</p></div>`; return; }
   const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === code);
-  if (!set.length){ out.innerHTML = '<div class="result neutral"><p class="meta" style="margin:0">Det finns ingen fil för det här kortet med de här funktionerna.</p></div>'; return; }
+  if (!set.length){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${t('res.nofile')}</p></div>`; return; }
   const fresh = checked('install')[0] === 'new';
   const mcu = set[0].mcu, esp = mcu.startsWith('esp32'), stm = mcu.startsWith('stm32'), rp = mcu === 'rp2040';
   const img = esp ? set.find(i => i.form === (fresh ? 'merged' : 'bin'))
@@ -404,33 +449,32 @@ function renderResult(){
   const dfu = !esp && set.find(i => i.form === 'zip');
   let how;
   if (stm){
-    how = `<ol class="how"><li>Anslut kortet med en ST-Link, eller via chipets seriella bootloader.</li>
-      <li>Skriv <code>.hex</code>-filen med <a href="https://www.st.com/en/development-tools/stm32cubeprog.html" target="_blank" rel="noopener">STM32CubeProgrammer</a>${fresh ? ', efter att ha raderat flashminnet (<i>Full chip erase</i>)' : ''}.</li></ol>`;
+    how = `<ol class="how"><li>${t('how.stm.1')}</li>
+      <li>${t(fresh ? 'how.stm.2.new' : 'how.stm.2')}</li></ol>`;
   } else if (rp){
-    how = `<ol class="how"><li>Håll ned BOOTSEL-knappen medan du ansluter kortet: det dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
-      ${fresh ? '<p class="note">Filen raderar inte inställningarna. Radera kortet först för en ren start.</p>' : ''}`;
+    how = `<ol class="how"><li>${t('how.rp.1')}</li><li>${t('how.uf2.copy')}</li></ol>
+      ${fresh ? `<p class="note">${t('how.rp.new')}</p>` : ''}`;
   } else if (esp && fresh){
-    how = `<ol class="how"><li>Öppna <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">MeshCores webbflashare</a> (Chrome eller Edge), eller använd esptool.</li>
-      <li>Radera flashminnet och skriv sedan filen på adress <code>0x0</code>.</li></ol>`;
+    how = `<ol class="how"><li>${t('how.espnew.1', {flasher: STOCK_FLASHER})}</li>
+      <li>${t('how.espnew.2')}</li></ol>`;
   } else if (esp){
-    how = `<ol class="how"><li>Skriv filen på adress <code>0x10000</code> med <a href="${STOCK_FLASHER}" target="_blank" rel="noopener">webbflasharen</a> eller esptool. Inställningarna finns kvar.</li>
-      ${base === 'observer' ? '<li>Eller, på en nod som redan kör den här firmwaren: <code>ota update</code> i nodens konsol hämtar den över wifi.</li>' : ''}</ol>
-      <p class="note">Visar <code>ver</code> fortfarande den gamla versionen? Noden har då uppdaterats över wifi någon gång och startar från sin andra programplats. Kör <code>esptool.py --chip ${mcu} erase_region 0xe000 0x2000</code> och starta om: den startar då filen du just skrev. Inställningarna finns kvar.</p>`;
+    how = `<ol class="how"><li>${t('how.esp.1', {flasher: STOCK_FLASHER})}</li>
+      ${base === 'observer' ? `<li>${t('how.esp.ota')}</li>` : ''}</ol>
+      <p class="note">${t('how.esp.note', {mcu})}</p>`;
   } else {
-    how = `<ol class="how"><li>Dubbelklicka på reset: kortet dyker upp som en USB-enhet.</li><li>Kopiera <code>.uf2</code>-filen dit. Kortet startar om av sig själv.</li></ol>
-      ${dfu ? `<p class="hint">Via Bluetooth i stället: <a href="${dfu.url}" download>DFU-paketet</a> (${mb(dfu.size)}) med appen nRF Connect eller nRF DFU.</p>` : ''}
-      ${fresh ? '<p class="note">De här filerna raderar aldrig något. Radera kortet först för en ren start, till exempel med raderingen i MeshCores webbflashare.</p>' : ''}`;
+    how = `<ol class="how"><li>${t('how.uf2.1')}</li><li>${t('how.uf2.copy')}</li></ol>
+      ${dfu ? `<p class="hint">${t('how.uf2.dfu', {url: dfu.url, size: mb(dfu.size)})}</p>` : ''}
+      ${fresh ? `<p class="note">${t('how.uf2.new')}</p>` : ''}`;
   }
-  const names = {ar: 'Autosvar', rc: 'Fjärrstyrning', arrc: 'Autosvar och fjärrstyrning'};
   out.innerHTML = `<div class="result">
-    <h3>${pretty(hw)} — ${names[code]}${base === 'observer' ? ', Observer' : ''}</h3>
-    <p class="meta">${release.tag}${release.prerelease ? ' (förhandsversion)' : ''} · ${fresh ? 'ny installation' : 'uppdatering'} · <a href="${release.url}">versionsinformation</a></p>
-    ${canFlash(img) ? `<div class="flash"><button type="button" class="btn btn-main" id="flash-btn">Flasha via USB</button>
-      <a class="btn btn-quiet" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>
-      <p class="hint">Anslut kortet med USB-kabel och tryck på <b>Flasha via USB</b>: webbläsaren frågar vilken port. ${fresh ? 'Hela flashminnet raderas först.' : 'Inställningarna finns kvar.'}</p>
+    <h3>${pretty(hw)} — ${t('res.' + code)}${base === 'observer' ? ', Observer' : ''}</h3>
+    <p class="meta">${release.tag}${release.prerelease ? t('ver.pre') : ''} · ${t(fresh ? 'res.new' : 'res.update')} · <a href="${release.url}">${t('res.notes')}</a></p>
+    ${canFlash(img) ? `<div class="flash"><button type="button" class="btn btn-main" id="flash-btn">${t('res.flash')}</button>
+      <a class="btn btn-quiet" href="${img.url}" download>${t('res.download', {size: mb(img.size)})}</a>
+      <p class="hint">${t('res.flash.hint')} ${t(fresh ? 'res.flash.hint.new' : 'res.flash.hint.update')}</p>
       <div id="flash-run" hidden><progress id="flash-bar" max="1" value="0"></progress><p id="flash-step" class="flash-step"></p>
-      <details class="flash-log"><summary>Logg</summary><pre id="flash-log"></pre></details></div></div>`
-    : `<a class="btn btn-main" href="${img.url}" download>Ladda ner (${mb(img.size)})</a>`}
+      <details class="flash-log"><summary>${t('res.log')}</summary><pre id="flash-log"></pre></details></div></div>`
+    : `<a class="btn btn-main" href="${img.url}" download>${t('res.download', {size: mb(img.size)})}</a>`}
     <p class="file">${img.file}${img.sha256 ? `<br>sha256 ${img.sha256}` : ''}</p>
     ${how}</div>`;
   if (canFlash(img)) $('flash-btn').onclick = () => startFlash(img, fresh);
@@ -459,8 +503,8 @@ async function startFlash(img, fresh){
     await flash({port, img, url: release.hosted + img.file, fresh,
       onStep: t => step.textContent = t,
       onProgress: f => bar.value = f,
-      onLog: l => log.textContent += l + '\n'});
-    step.textContent = 'Klart. Kortet startar om med den nya firmwaren: kontrollera med ver i konsolen.';
+      onLog: l => log.textContent += l + '\n', t});
+    step.textContent = t('res.flash.done');
     step.classList.add('ok');
   } catch (e){
     step.textContent = e.message || String(e);
@@ -484,27 +528,22 @@ function renderConfig(){
   const lines = [];
   if (ar){
     const lan = $('lan').value;
-    const scope = lan ? countyScope(lan) : '<län>';
+    const scope = lan ? countyScope(lan) : t('cfg.county.placeholder');
     $('lan-hint').innerHTML = lan
-      ? `Noden får <code>${scope}</code> som hemregion och svarar på <code>#test-${scope}</code>. Standardregionen blir <code>se</code>, så att repeaterns adverts når hela Sverige. ${{
-          lokalt: 'Länet har bestämt namnet själv.',
-          uppmatt: 'Namnet är det som används mest i länet, uppmätt i trafiken.',
-          forslag: 'Namnet är ett förslag: länet har inte bestämt något och ingen variant används av en majoritet än.',
-        }[nameStatus.get(lan)] || ''} Har noden redan länet som hemregion, till exempel från meshat.se:s guide, räcker <code>set autoreply on</code>.`
-      : 'Välj länet repeatern står i.';
+      ? t('cfg.county.set', {scope, status: nameStatus.has(lan) ? t('cfg.status.' + nameStatus.get(lan)) : ''})
+      : t('cfg.county.hint');
     lines.push(`region put ${scope}`, 'region put se', `region home ${scope}`, 'region default se', 'region save', 'set autoreply on');
   }
   if (rc){
     const key = $('pubkey').value.trim();
     const ok = /^[0-9a-fA-F]{64}$/.test(key);
     $('pubkey').classList.toggle('bad', key !== '' && !ok);
-    lines.push(`set mqtt.cmd.pubkey ${ok ? key.toUpperCase() : '<din nyckel>'}`, 'set mqtt.cmd on', 'reboot');
+    lines.push(`set mqtt.cmd.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, 'set mqtt.cmd on', 'reboot');
   }
   $('cmds').textContent = lines.join('\n');
-  const channel = ar && $('lan').value ? `#test-${countyScope($('lan').value)}` : '#test-&lt;län&gt;';
-  $('done-text').innerHTML = 'Grattis, nu är du klar! ' + (ar
-    ? `Se om det fungerar genom att skicka <code>test</code> i kanalen <code>${channel}</code>. Svaret kan dröja ett par minuter, så ha tålamod. Noden svarar samma avsändare högst en gång per fem minuter.`
-    : 'Se om det fungerar genom att skicka ett kommando till noden med <a href="https://github.com/sweden-mesh/mccontrol">mccontrol</a>.');
+  const esc = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const channel = '#test-' + (ar && $('lan').value ? countyScope($('lan').value) : esc(t('cfg.county.placeholder')));
+  $('done-text').innerHTML = t('done.congrats') + (ar ? t('done.ar', {channel}) : t('done.rc'));
 }
 
 function update(keepBoard){ fillBoards(keepBoard); render(); }
@@ -512,16 +551,15 @@ function update(keepBoard){ fillBoards(keepBoard); render(); }
 async function load(){
   try {
     const r = await fetch(INDEX, {cache: 'no-cache'});
-    if (!r.ok) throw new Error(`listan svarade ${r.status}`);
+    if (!r.ok) throw new Error(t('load.status', {status: r.status}));
     index = await r.json();
   } catch (e){
-    $('out').innerHTML = `<p class="hint">Kunde inte läsa in listan med filer: ${e.message}. <a href="https://github.com/sweden-mesh/MeshCore-lou/releases">Alla versioner på GitHub</a>.</p>`;
+    $('out').innerHTML = `<p class="hint">${t('load.fail', {error: e.message})}</p>`;
     return;
   }
-  if (!index.releases.length){ $('out').innerHTML = '<p class="hint">Inga versioner än.</p>'; return; }
+  if (!index.releases.length){ $('out').innerHTML = `<p class="hint">${t('load.none')}</p>`; return; }
   $('all').href = `https://github.com/${index.repo}/releases`;
-  $('gen').textContent = `Listan uppdaterades ${index.generated.slice(0, 16).replace('T', ' ')} UTC.`;
-  for (const r of index.releases) $('release').add(new Option(r.tag + (r.prerelease ? ' (förhandsversion)' : ''), r.tag));
+  fillReleases();
   const s = readHash();
   pickRelease(s.r);
   update(s.hw);
@@ -545,8 +583,29 @@ async function loadCountyNames(){
   renderConfig();
 }
 
-$('lan').add(new Option('Välj län …', ''));
-for (const [code, name] of COUNTIES) $('lan').add(new Option(name, code));
+// The lists in the language shown: counties, releases, and when the list was made.
+function fillCounties(){
+  const sel = $('lan'), keep = sel.value;
+  sel.innerHTML = '';
+  sel.add(new Option(t('cfg.county.pick'), ''));
+  for (const code of COUNTIES) sel.add(new Option(t('county.' + code), code));
+  sel.value = keep;
+}
+function fillReleases(){
+  const sel = $('release');
+  sel.innerHTML = '';
+  for (const r of index.releases) sel.add(new Option(r.tag + (r.prerelease ? t('ver.pre') : ''), r.tag));
+  if (release) sel.value = release.tag;
+  $('gen').textContent = t('footer.gen', {time: index.generated.slice(0, 16).replace('T', ' ')});
+}
+
+applyStrings();
+$('langs').addEventListener('click', e => {
+  const a = e.target.closest('a[data-lang]');
+  if (!a) return;
+  e.preventDefault();
+  setLang(a.dataset.lang);
+});
 
 for (const i of document.querySelectorAll('input[name="f"]')){
   i.addEventListener('change', () => {
@@ -572,7 +631,7 @@ $('genkey').addEventListener('click', async () => {
     pub = new Uint8Array(await crypto.subtle.exportKey('raw', pair.publicKey));
     seed = new Uint8Array(await crypto.subtle.exportKey('pkcs8', pair.privateKey)).slice(-32);
   } catch {
-    $('pubkey-hint').textContent = 'Den här webbläsaren kan inte skapa nycklar. Använd en ny version av Chrome, Edge, Firefox eller Safari, eller mccontrol keygen.';
+    $('pubkey-hint').textContent = t('cfg.key.nocrypto');
     return;
   }
   $('pubkey').value = hex(pub);
@@ -581,9 +640,9 @@ $('genkey').addEventListener('click', async () => {
   $('keydlg').showModal();
 });
 $('seed-copy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('seed').textContent); $('seed-copy').textContent = 'Kopierat'; }
-  catch { $('seed-copy').textContent = 'Markera och kopiera'; }
-  setTimeout(() => { $('seed-copy').textContent = 'Kopiera'; }, 1500);
+  try { await navigator.clipboard.writeText($('seed').textContent); $('seed-copy').textContent = t('copy.done'); }
+  catch { $('seed-copy').textContent = t('copy.manual'); }
+  setTimeout(() => { $('seed-copy').textContent = t('copy'); }, 1500);
 });
 $('seed-save').addEventListener('click', () => {
   const a = document.createElement('a');
@@ -596,9 +655,9 @@ $('seed-done').addEventListener('click', () => { $('keydlg').close(); $('seed').
 $('keydlg').addEventListener('cancel', e => e.preventDefault());
 
 $('copy').addEventListener('click', async () => {
-  try { await navigator.clipboard.writeText($('cmds').textContent); $('copy').textContent = 'Kopierat'; }
-  catch { $('copy').textContent = 'Markera och kopiera'; }
-  setTimeout(() => { $('copy').textContent = 'Kopiera'; }, 1500);
+  try { await navigator.clipboard.writeText($('cmds').textContent); $('copy').textContent = t('copy.done'); }
+  catch { $('copy').textContent = t('copy.manual'); }
+  setTimeout(() => { $('copy').textContent = t('copy'); }, 1500);
 });
 $('filter').addEventListener('input', () => update());
 $('boards').addEventListener('change', render);
