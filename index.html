@@ -137,6 +137,14 @@ dialog.keydlg::backdrop{background:rgb(8 16 14/.55)}
 .keydlg .actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:14px 22px;border-top:1px solid var(--line)}
 details.ver{margin-top:18px;font-size:.9rem}
 details.ver summary{cursor:pointer;color:var(--muted)}
+.alt{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:56px 0 40px}
+.alt h2{font-size:1.15rem;margin:0 0 6px}
+.alt p{margin:0 0 6px}
+.alt ul{margin:0 0 12px;padding-left:20px}
+.alt li{margin:4px 0}
+.alt .others{margin-top:4px}
+.alt .others li{font-size:.93rem}
+.alt .ours{margin:0;color:var(--muted);font-size:.93rem}
 footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;color:var(--muted)}
 @media (max-width:520px){.panel{padding:4px 14px 16px}.feature{padding:16px}}
 </style>
@@ -162,7 +170,25 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 </header>
 
 <main class="wrap">
-<section aria-labelledby="h-funktioner" style="margin-top:56px">
+<aside class="alt" aria-labelledby="h-alt">
+  <h2 id="h-alt" data-i18n="alt.h"></h2>
+  <p data-i18n="alt.p"></p>
+  <ul>
+    <li data-i18n="alt.official"></li>
+    <li data-i18n="alt.observer"></li>
+  </ul>
+  <p class="others" data-i18n="alt.others"></p>
+  <ul class="others">
+    <li data-i18n="alt.cairn"></li>
+    <li data-i18n="alt.easyskymesh"></li>
+    <li data-i18n="alt.meck"></li>
+    <li data-i18n="alt.lowpower"></li>
+    <li data-i18n="alt.solo"></li>
+  </ul>
+  <p class="ours" data-i18n="alt.ours"></p>
+</aside>
+
+<section aria-labelledby="h-funktioner">
   <h2 id="h-funktioner" data-i18n="feat.h"></h2>
   <p class="sub" data-i18n="feat.sub"></p>
   <div class="features">
