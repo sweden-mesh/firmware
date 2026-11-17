@@ -18,8 +18,9 @@ then the board. The answer is one file and how to flash it.
 - `flasher.js` — flashes an ESP32 board from the page over Web Serial (Chrome, Edge), with
   `vendor/esptool-js-0.7.0/` (see its README).
 - `tools/build_index.py` — writes `index.json` from the releases.
-- `tools/host_images.py` — copies the hosted release's ESP32 images into the site, each checked
-  against its sha256.
+- `tools/host_images.py` — copies the hosted release's ESP32 images and nRF52 DFU `.zip`s into
+  the site, each checked against its sha256, and writes `fw/hosted.json` (tag, folder, one row per
+  image) for the regional sites' flashers.
 - `tools/test_flasher.mjs` — checks the flasher's chip, partition-table and checksum logic:
   `node tools/test_flasher.mjs <a -merged.bin>`.
 - `.github/workflows/index.yml` — runs `build_index.py` hourly and on demand, commits
@@ -60,6 +61,11 @@ GitHub Pages, source "GitHub Actions" (Settings → Pages). `deploy.yml` builds 
 page, `index.json`, `strings.js`, `flasher.js`, `vendor/` and the hosted release's ESP32 images, `.bin` and
 `-merged.bin` under `fw/<tag>/` (284 files, 449 MB at lou-15). GitHub's release downloads
 cannot be read by another site's page, so the page can only flash images served from here.
+The nRF52 DFU packages (41 `.zip`, 15 MB) are hosted too, for the regional sites' serial DFU.
+
+When the secrets `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY` exist, `deploy.yml`
+also uploads `fw/` to the Cloudflare R2 bucket `meshcore-fw` (served as `fw.meshcoresverige.se`),
+which the regional sites' flashers read; without them the step is skipped.
 The images go into the Pages artifact, never into git, and are cached by tag, so they are
 downloaded again only for a new release.
 

@@ -44,14 +44,14 @@ jobs:
           path: fw-cache
           key: fw-${{ steps.release.outputs.tag }}
 
-      - name: Download the ESP32 images
+      - name: Download the ESP32 images and nRF52 DFU packages
         if: steps.cache.outputs.cache-hit != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p fw-cache
           gh release download "${{ steps.release.outputs.tag }}" -R "$(python3 -c 'import json; print(json.load(open("index.json"))["repo"])')" \
-            -D fw-cache -p '*-esp32*-v*.bin'
+            -D fw-cache -p '*-esp32*-v*.bin' -p '*-nrf52840-v*.zip'
 
       - name: Build the site and check every image
         run: |
@@ -60,6 +60,23 @@ jobs:
           [ -d vendor ] && cp -r vendor _site/
           python3 tools/host_images.py index.json "${{ steps.release.outputs.tag }}" fw-cache _site
           du -sh _site
+
+      # The regional sites' flashers read fw/ from Cloudflare R2 (fw.meshcoresverige.se). Skipped
+      # until the bucket's secrets exist. Images are immutable (the name carries version and
+      # hash); hosted.json changes with each release, so it is short-lived.
+      - name: Upload fw/ to R2
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        if: env.R2_ACCOUNT_ID != ''
+        run: |
+          ep="https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          aws s3 sync _site/fw/ s3://meshcore-fw/fw/ --endpoint-url "$ep" --exclude hosted.json \
+            --cache-control 'public, max-age=31536000, immutable' --only-show-errors
+          aws s3 cp _site/fw/hosted.json s3://meshcore-fw/fw/hosted.json --endpoint-url "$ep" \
+            --cache-control 'public, max-age=300' --content-type application/json
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Copy a release's ESP32 images into the site, each checked against index.json.
+"""Copy a release's ESP32 images and nRF52 DFU packages into the site, each checked against
+index.json, and write fw/hosted.json for the regional sites' flashers.
 
     python3 tools/host_images.py index.json <tag> <downloaded dir> <site dir>
 
-Every ESP32 image index.json lists for <tag> must be in <downloaded dir> with the sha256
-GitHub reported for it; the first missing or different file stops the build, so the site
-never serves an image the page would refuse. They land in <site dir>/fw/<tag>/.
+Every ESP32 image and nRF52 .zip index.json lists for <tag> must be in <downloaded dir> with
+the sha256 GitHub reported for it; the first missing or different file stops the build, so the
+site never serves an image the page would refuse. They land in <site dir>/fw/<tag>/.
+
+<site dir>/fw/hosted.json is what a regional site's flasher reads: the hosted tag, the folder,
+and one row per image (hw, base, features, mcu, form, file, size, sha256), without the
+GitHub URLs, which a page cannot read anyway.
 """
 import hashlib
 import json
@@ -22,11 +27,19 @@ def sha256(path):
     return h.hexdigest()
 
 
+def hosted(image):
+    """ESP32 app and merged images, and nRF52 DFU packages (serial DFU needs the .zip)."""
+    return image["mcu"].startswith("esp32") or (image["mcu"].startswith("nrf52") and image["form"] == "zip")
+
+
+ROW = ("hw", "board", "base", "features", "mcu", "form", "file", "size", "sha256")
+
+
 def main():
     index_path, tag, src, site = sys.argv[1:5]
     index = json.load(open(index_path))
     release = next(r for r in index["releases"] if r["tag"] == tag)
-    images = [i for i in release["images"] if i["mcu"].startswith("esp32")]
+    images = [i for i in release["images"] if hosted(i)]
     if not images:
         sys.exit(f"{tag}: no ESP32 images in index.json")
     dest = Path(site) / "fw" / tag
@@ -42,6 +55,14 @@ def main():
             sys.exit(f"sha256 differs: {image['file']}")
         shutil.copyfile(path, dest / image["file"])
         total += image["size"]
+    with open(Path(site) / "fw" / "hosted.json", "w") as f:
+        json.dump({
+            "repo": index["repo"],
+            "tag": tag,
+            "base": f"fw/{tag}/",
+            "images": [{k: i[k] for k in ROW} for i in images],
+        }, f, separators=(",", ":"))
+        f.write("\n")
     print(f"{tag}: {len(images)} images, {total / 1e6:.0f} MB, in {dest}")
 
 
