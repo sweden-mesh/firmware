@@ -42,7 +42,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: fw-cache
-          key: fw-${{ steps.release.outputs.tag }}
+          key: fw-esp32-nrf52-${{ steps.release.outputs.tag }}   # the set of files is part of the key
 
       - name: Download the ESP32 images and nRF52 DFU packages
         if: steps.cache.outputs.cache-hit != 'true'
