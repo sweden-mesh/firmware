@@ -36,14 +36,14 @@ code{font:.86em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:
 
 /* hero */
 header.hero{background:var(--hero);color:#fff;padding:44px 0 56px}
-.eyebrow{font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin:0}
-.hero .top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 10px}
+.hero .top{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:0 0 10px}
 .langs{display:flex;gap:4px;font-size:.88rem}
 .langs a{color:#fff;opacity:.78;text-decoration:none;padding:6px 8px;border-radius:6px}
 .langs a:hover{opacity:1;background:rgb(255 255 255/.08)}
 .langs a[aria-current]{opacity:1;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .hero h1{font-size:clamp(1.7rem,4.5vw,2.5rem);line-height:1.15;margin:0 0 14px;letter-spacing:-.01em}
 .hero p{max-width:680px;margin:0 0 12px;opacity:.92}
+.hero p a{color:#fff;text-decoration:underline;text-underline-offset:3px}
 .hero code{background:rgb(255 255 255/.14);color:#fff}
 .hero .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;font-weight:600;text-decoration:none;font-size:.95rem}
@@ -153,13 +153,13 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 <header class="hero">
   <div class="wrap">
     <div class="top">
-      <p class="eyebrow">sweden-mesh</p>
       <nav class="langs" id="langs" data-i18n-label="lang.label">
         <a href="?lang=sv" hreflang="sv" lang="sv" data-lang="sv">Svenska</a>
         <a href="?lang=en" hreflang="en" lang="en" data-lang="en">English</a>
       </nav>
     </div>
     <h1 data-i18n="hero.h1"></h1>
+    <p class="std" data-i18n="hero.std"></p>
     <p data-i18n="hero.p1"></p>
     <p data-i18n="hero.p2"></p>
     <div class="links">

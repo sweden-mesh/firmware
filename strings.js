@@ -7,6 +7,7 @@ sv: {
   'lang.label': 'Språk',
 
   'hero.h1': 'lou-firmware för MeshCore',
+  'hero.std': '<strong>Den här sidan listar bara lou, en specialfirmware.</strong> Är du ny på MeshCore, eller vet inte vad du behöver, ta den vanliga firmwaren i <a href="https://flasher.meshcore.io/" rel="noopener">MeshCores officiella flasher</a>. Vill du att noden rapporterar till MQTT, ta <a href="https://observer.gessaman.com/" rel="noopener">Observer-firmwaren</a>.',
   'hero.p1': 'lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla enheter som har plats.',
   'hero.p2': 'Varje version heter som MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-15</code>.',
   'hero.find': 'Hitta din fil',
@@ -181,6 +182,7 @@ en: {
   'lang.label': 'Language',
 
   'hero.h1': 'lou-firmware for MeshCore',
+  'hero.std': '<strong>This page lists only lou, a special firmware.</strong> If you are new to MeshCore, or not sure what you need, take the standard firmware from <a href="https://flasher.meshcore.io/" rel="noopener">the official MeshCore flasher</a>. If you want the node to report to MQTT, take <a href="https://observer.gessaman.com/" rel="noopener">the Observer firmware</a>.',
   'hero.p1': 'lou-firmware is MeshCore with additions from sweden-mesh: repeaters that answer <code>test</code> so that the mesh can measure itself, and remote control with signed commands. It is built both on stock MeshCore and on agessaman\'s Observer firmware, for every board that has room.',
   'hero.p2': 'Each version is named after the MeshCore version it builds on and a sequence number, for example <code>v1.18.0-lou-15</code>.',
   'hero.find': 'Find your file',
