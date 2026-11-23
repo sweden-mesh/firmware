@@ -11,6 +11,11 @@ then the board. The answer is one file and how to flash it.
   else `sv` for a Swedish browser and `en` for any other. The switch in the header sets all three.
 - `tools/test_strings.mjs` — checks that both tables have the same keys and placeholders:
   `node --test tools/test_strings.mjs`.
+- `releases.js` — which releases the page offers. **Release** (the default) offers the full
+  releases and never a pre-release or a draft. **Pre-release** (`?channel=prerelease`) offers one
+  release at most: the newest pre-release, and nothing when a full release is newer than it.
+- `tools/test_releases.mjs` — checks those rules and the address parameter:
+  `node --test tools/test_releases.mjs`.
 - `index.json` — every image in the releases: board, base (stock or Observer), features, chip,
   file, size, sha256 and download URL. The latest full release is marked `hosted`. The page
   reads only this file, so a visitor makes one request to this site and is never rate limited
@@ -18,6 +23,8 @@ then the board. The answer is one file and how to flash it.
 - `flasher.js` — flashes an ESP32 board from the page over Web Serial (Chrome, Edge), with
   `vendor/esptool-js-0.7.0/` (see its README).
 - `tools/build_index.py` — writes `index.json` from the releases.
+- `tools/test_build_index.py` — checks the image names it reads, a pre-release revision
+  (`lou-20rc`) against the feature code `rc`: `python3 tools/test_build_index.py`.
 - `tools/host_images.py` — copies the hosted release's ESP32 images and nRF52 DFU `.zip`s into
   the site, each checked against its sha256, and writes `fw/hosted.json` (tag, folder, one row per
   image) for the regional sites' flashers.
@@ -53,12 +60,13 @@ Choices with no image of ours lead onward: no features to MeshCore's web flasher
 alone to agessaman's Observer firmware.
 
 The choice lives in the URL, so a link can be shared: `#f=obs,ar,rc&install=new&hw=heltec_v4`, in
-English `?lang=en#f=obs,ar,rc&install=new&hw=heltec_v4`.
+English `?lang=en#f=obs,ar,rc&install=new&hw=heltec_v4`. A link to the pre-release has
+`?channel=prerelease` before the `#`.
 
 ## Hosting
 
 GitHub Pages, source "GitHub Actions" (Settings → Pages). `deploy.yml` builds the site from the
-page, `index.json`, `strings.js`, `flasher.js`, `vendor/` and the hosted release's ESP32 images, `.bin` and
+page, `index.json`, `strings.js`, `releases.js`, `flasher.js`, `vendor/` and the hosted release's ESP32 images, `.bin` and
 `-merged.bin` under `fw/<tag>/` (284 files, 449 MB at lou-15). GitHub's release downloads
 cannot be read by another site's page, so the page can only flash images served from here.
 The nRF52 DFU packages (41 `.zip`, 15 MB) are hosted too, for the regional sites' serial DFU.

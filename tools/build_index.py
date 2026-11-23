@@ -10,7 +10,8 @@ this script; the releases are public either way.
 The latest full release gets "hosted": "fw/<tag>/", where the site serves its ESP32 images.
 
 Image names: <board>-<mcu>-v<x.y.z>-lou-<nn>-<features>-<hash>[-merged].<ext>, and the
-older -ar-<nn>-<hash> names, which carried every feature.
+older -ar-<nn>-<hash> names, which carried every feature. A pre-release has rc or rc<n> on
+the revision (lou-20rc, lou-20rc2); the feature code rc is a token of its own after it.
 """
 import json
 import os
@@ -22,7 +23,7 @@ from datetime import datetime, timezone
 REPO = sys.argv[1] if len(sys.argv) > 1 else "sweden-mesh/MeshCore-lou"
 NAME = re.compile(
     r"^(?P<board>.+?)-(?P<mcu>esp32s3|esp32c6|esp32c3|esp32|nrf52840|rp2040|stm32\w*)"
-    r"-v(?P<base_version>\d+\.\d+\.\d+)-(?:lou-(?P<rev>\d+)-(?P<features>[a-z]+)|ar-(?P<old_rev>\d+))"
+    r"-v(?P<base_version>\d+\.\d+\.\d+)-(?:lou-(?P<rev>\d+(?:rc\d*)?)-(?P<features>[a-z]+)|ar-(?P<old_rev>\d+))"
     r"-[0-9a-f]+(?P<merged>-merged)?\.(?P<ext>bin|uf2|zip|hex)$")
 
 
@@ -71,7 +72,7 @@ def main():
                 releases.append({
                     "tag": r["tag_name"],
                     "prerelease": r["prerelease"],
-                    "published": r["published_at"],
+                    "published": r["published_at"] or r["created_at"],
                     "url": r["html_url"],
                     "images": sorted(images, key=lambda i: (i["board"], i["features"], i["form"])),
                 })

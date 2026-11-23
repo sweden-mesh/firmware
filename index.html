@@ -233,6 +233,15 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   <h2 id="h-valj" data-i18n="pick.h"></h2>
   <p class="sub" data-i18n="pick.sub"></p>
   <div class="panel">
+    <fieldset id="s-channel">
+      <legend><span data-i18n="channel.h"></span></legend>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="channel" value="release" checked><span><b data-i18n="channel.release.b"></b><small data-i18n="channel.release"></small></span></label>
+        <label class="opt"><input type="radio" name="channel" value="prerelease"><span><b data-i18n="channel.pre.b"></b><small data-i18n="channel.pre"></small></span></label>
+      </div>
+      <p class="note" id="channel-note" data-i18n="channel.note" hidden></p>
+    </fieldset>
+
     <fieldset id="s-type">
       <legend><span class="n">1</span><span data-i18n="pick.type"></span></legend>
       <div class="opts">
@@ -325,6 +334,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
 </footer>
 
 <script src="strings.js"></script>
+<script src="releases.js"></script>
 
 <script>
 const INDEX = 'index.json';
@@ -344,6 +354,8 @@ const countyScope = code => chosenNames.get(code) || 'se' + code;
 const $ = id => document.getElementById(id);
 const checked = name => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(i => i.value);
 let index = null, release = null;
+// Release or pre-release: ?channel=prerelease in the address, else release (releases.js).
+let channel = readChannel(location.search);
 let flashing = false;   // while a board is written, the result box stays as it is
 
 // The language: ?lang= in the address, else the visitor's last choice, else the browser's.
@@ -407,21 +419,44 @@ function writeHash(){
   h.set('install', checked('install')[0]);
   if ($('boards').value) h.set('hw', $('boards').value);
   if ($('lan').value) h.set('lan', $('lan').value);
-  if (release && index && release !== index.releases[0]) h.set('r', release.tag);
+  if (release && release !== offered(index.releases, channel)[0]) h.set('r', release.tag);
   history.replaceState(null, '', '#' + h);
 }
 
+// The release shown: the one asked for when the channel offers it, else the channel's newest.
+// None when the channel offers nothing.
 function pickRelease(tag){
-  const full = index.releases.filter(r => !r.prerelease);
-  release = index.releases.find(r => r.tag === tag) || full[0] || index.releases[0];
-  $('release').value = release.tag;
+  const list = offered(index.releases, channel);
+  release = list.find(r => r.tag === tag) || list[0] || null;
+  if (release) $('release').value = release.tag;
+}
+
+function setChannel(c){
+  channel = c;
+  history.replaceState(null, '', withChannel(location.href, c));
+  showChannel();
+  fillReleases();
+  pickRelease();
+  update();
+}
+function showChannel(){
+  document.querySelector(`input[name="channel"][value="${channel}"]`).checked = true;
+  $('channel-note').hidden = channel !== 'prerelease';
+  document.querySelector('details.ver').hidden = channel === 'prerelease';   // one pre-release, no list
+}
+
+// Why the channel offers nothing, in one sentence.
+function nothingOffered(){
+  if (channel !== 'prerelease') return t('load.none');
+  const pre = newestPrerelease(index.releases);
+  return pre ? t('channel.superseded', {pre: pre.tag, full: offered(index.releases, 'release')[0].tag}) : t('channel.none');
 }
 
 function fillBoards(keep){
   const {base, code} = wanted();
   const q = $('filter').value.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
   const sel = $('boards'), want = keep || sel.value;
-  const hws = [...new Set(release.images.filter(i => i.base === base && i.features === code).map(i => i.hw))]
+  const hws = [...new Set((release ? release.images : []).filter(i => i.base === base && i.features === code).map(i => i.hw))]
     .sort((a, b) => a.localeCompare(b, 'sv', {sensitivity: 'base'}));
   sel.innerHTML = '';
   let group = null, shown = 0;
@@ -457,6 +492,7 @@ function renderResult(){
   if (flashing) return;
   writeHash();
   const out = $('out'), {base, code, f} = wanted();
+  if (!release){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${nothingOffered()}</p></div>`; return; }
   if (!code){
     out.innerHTML = f.has('obs')
       ? onward(t('res.onward.obs'), OBSERVER_HOME, t('res.onward.obs.link'))
@@ -545,7 +581,7 @@ async function startFlash(img, fresh){
 // Step 5: the console commands for the features chosen, after flashing.
 function renderConfig(){
   const {code} = wanted();
-  const ready = code && $('boards').value && !$('out').querySelector('.neutral');
+  const ready = release && code && $('boards').value && !$('out').querySelector('.neutral');
   $('cfg').hidden = $('done').hidden = !ready;
   if (!ready) return;
   const ar = code.includes('ar'), rc = code.includes('rc');
@@ -620,12 +656,14 @@ function fillCounties(){
 function fillReleases(){
   const sel = $('release');
   sel.innerHTML = '';
-  for (const r of index.releases) sel.add(new Option(r.tag + (r.prerelease ? t('ver.pre') : ''), r.tag));
+  for (const r of offered(index.releases, channel)) sel.add(new Option(r.tag + (r.prerelease ? t('ver.pre') : ''), r.tag));
   if (release) sel.value = release.tag;
   $('gen').textContent = t('footer.gen', {time: index.generated.slice(0, 16).replace('T', ' ')});
 }
 
 applyStrings();
+showChannel();
+for (const i of document.querySelectorAll('input[name="channel"]')) i.addEventListener('change', () => setChannel(i.value));
 $('langs').addEventListener('click', e => {
   const a = e.target.closest('a[data-lang]');
   if (!a) return;
