@@ -600,7 +600,10 @@ function renderConfig(){
     const key = $('pubkey').value.trim();
     const ok = /^[0-9a-fA-F]{64}$/.test(key);
     $('pubkey').classList.toggle('bad', key !== '' && !ok);
-    lines.push(`set mqtt.cmd.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, 'set mqtt.cmd on', 'reboot');
+    // From lou-20 the settings are named cmd.*; lou-19 and older know only mqtt.cmd.*.
+    const rev = Number((/-lou-(\d+)/.exec(release ? release.tag : '') || [])[1] || 0);
+    const p = rev >= 20 ? 'cmd' : 'mqtt.cmd';
+    lines.push(`set ${p}.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, `set ${p} on`, 'reboot');
   }
   $('cmds').textContent = lines.join('\n');
   const esc = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
