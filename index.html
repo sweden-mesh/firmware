@@ -533,7 +533,7 @@ async function startFlash(img, fresh){
   step.className = 'flash-step';
   log.textContent = '';
   try {
-    const {flash} = await import('./flasher.js?v=4');
+    const {flash} = await import('./flasher.js?v=3');
     await flash({port, img, url: release.hosted + img.file, fresh,
       onStep: t => step.textContent = t,
       onProgress: f => bar.value = f,
