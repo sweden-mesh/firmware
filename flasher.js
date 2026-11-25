@@ -119,15 +119,28 @@ export async function flash({port, img, url, fresh, onStep, onProgress, onLog, t
 }
 
 // Lets go of the serial port, so another program can open it without the page being reloaded.
-// The reset at the end can leave a stream locked, and then the library's disconnect never
-// returns: give it 3 s, and if the port is still open give the port up, which closes it.
+// The library's disconnect can hang after the reset (a stream stays locked), so each step has a
+// time limit and says in the log how it went: close the reader, close the port, and if the port
+// will not close, give it up (which closes it; the browser then asks for the port again next time).
 async function release(transport, port, onLog){
-  const wait = ms => new Promise(r => setTimeout(r, ms));
-  await Promise.race([transport.disconnect().catch(() => {}), wait(3000)]);
-  if (!port.readable && !port.writable) return;
-  try {
-    await Promise.race([port.forget ? port.forget() : port.close(), wait(2000)]);
-  } catch (e){
-    onLog('port: ' + (e.message || e));
-  }
+  const wait = (ms, v) => new Promise(r => setTimeout(() => r(v), ms));
+  const step = async (name, run, ms) => {
+    try {
+      const r = await Promise.race([run().then(() => 'ok'), wait(ms, 'timeout')]);
+      onLog(`port: ${name} ${r}`);
+      return r === 'ok';
+    } catch (e){
+      onLog(`port: ${name} ${e.name || 'error'}: ${e.message || e}`);
+      return e.name === 'InvalidStateError';   // already closed
+    }
+  };
+  const state = () => `readable ${port.readable ? (port.readable.locked ? 'locked' : 'open') : 'none'}, writable ${port.writable ? (port.writable.locked ? 'locked' : 'open') : 'none'}`;
+  onLog('port: ' + state());
+  if (await step('disconnect', () => transport.disconnect(), 3000)) return;
+  if (port.readable && port.readable.locked && transport.reader)
+    await step('reader cancel', () => transport.reader.cancel(), 1000);
+  await wait(200);
+  onLog('port: ' + state());
+  if (await step('close', () => port.close(), 2000)) return;
+  if (port.forget) await step('forget', () => port.forget(), 2000);
 }
