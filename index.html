@@ -330,8 +330,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   <div class="wrap"><span data-i18n="footer"></span> <span id="gen"></span></div>
 </footer>
 
-<script src="strings.js?v=6"></script>
-<script src="releases.js?v=5"></script>
+<script src="strings.js?v=7"></script>
+<script src="releases.js?v=6"></script>
 
 <script>
 const INDEX = 'index.json';
@@ -398,7 +398,8 @@ function wanted(){
   const f = new Set(checked('f'));
   const base = f.has('obs') ? 'observer' : 'core';
   const code = (f.has('ar') ? 'ar' : '') + (f.has('rc') ? 'rc' : '');
-  return {base, code, f};
+  // `code` is what is ticked (the commands follow it); `image` is the code of the file offered.
+  return {base, code, image: imageCode(release ? release.images : [], base, code), f};
 }
 
 function readHash(){
@@ -429,10 +430,10 @@ function pickRelease(tag){
 }
 
 function fillBoards(keep){
-  const {base, code} = wanted();
+  const {base, image} = wanted();
   const q = $('filter').value.toLowerCase().replace(/[\s_-]+/g, ' ').trim();
   const sel = $('boards'), want = keep || sel.value;
-  const hws = [...new Set((release ? release.images : []).filter(i => i.base === base && i.features === code).map(i => i.hw))]
+  const hws = [...new Set((release ? release.images : []).filter(i => i.base === base && i.features === image).map(i => i.hw))]
     .sort((a, b) => a.localeCompare(b, 'sv', {sensitivity: 'base'}));
   sel.innerHTML = '';
   let group = null, shown = 0;
@@ -467,7 +468,7 @@ function render(){
 function renderResult(){
   if (flashing) return;
   writeHash();
-  const out = $('out'), {base, code, f} = wanted();
+  const out = $('out'), {base, code, image, f} = wanted();
   if (!release){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${t('load.none')}</p></div>`; return; }
   if (!code){
     out.innerHTML = f.has('obs')
@@ -477,7 +478,7 @@ function renderResult(){
   }
   const hw = $('boards').value;
   if (!hw){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${t('res.pickhw')}</p></div>`; return; }
-  const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === code);
+  const set = release.images.filter(i => i.hw === hw && i.base === base && i.features === image);
   if (!set.length){ out.innerHTML = `<div class="result neutral"><p class="meta" style="margin:0">${t('res.nofile')}</p></div>`; return; }
   const fresh = checked('install')[0] === 'new';
   const mcu = set[0].mcu, esp = mcu.startsWith('esp32'), stm = mcu.startsWith('stm32'), rp = mcu === 'rp2040';
@@ -507,6 +508,7 @@ function renderResult(){
   out.innerHTML = `<div class="result">
     <h3>${pretty(hw)} — ${t('res.' + code)}${base === 'observer' ? ', Observer' : ''}</h3>
     <p class="meta">${release.tag} · ${t(fresh ? 'res.new' : 'res.update')} · <a href="${release.url}">${t('res.notes')}</a></p>
+    ${image !== code ? `<p class="hint">${t('res.full')}</p>` : ''}
     ${canFlash(img) ? `<div class="flash"><button type="button" class="btn btn-main" id="flash-btn">${t('res.flash')}</button>
       <a class="btn btn-quiet" href="${img.url}" download>${t('res.download', {size: mb(img.size)})}</a>
       <p class="hint">${t('res.flash.hint')} ${t(fresh ? 'res.flash.hint.new' : 'res.flash.hint.update')}</p>
