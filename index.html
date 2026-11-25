@@ -330,7 +330,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   <div class="wrap"><span data-i18n="footer"></span> <span id="gen"></span></div>
 </footer>
 
-<script src="strings.js?v=5"></script>
+<script src="strings.js?v=6"></script>
 <script src="releases.js?v=5"></script>
 
 <script>
@@ -572,6 +572,9 @@ function renderConfig(){
     lines.push(`set wifi.ssid ${ssid || t('cfg.wifi.ssid.placeholder')}`);
     if (pwd) lines.push(`set wifi.pwd ${pwd}`);
     lines.push(`set mqtt.iata ${iata || t('cfg.iata.placeholder')}`, 'set mqtt1.preset meshat.se');
+    // Automatic updates (operator 2026-11-25): the node takes later releases by itself, so the
+    // next one needs nobody at it. The hint under the fields says so and how to leave it out.
+    lines.push('set ota.auto on');
   }
   if (ar){
     const lan = $('lan').value;
