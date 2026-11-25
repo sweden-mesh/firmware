@@ -45,9 +45,9 @@ that the board's chip matches the image and that the file matches its sha256, th
 - **Ny installation:** checks the board has the flash the image needs, erases all of it and
   writes the merged image at `0x0`.
 
-Until it has been tested on real boards the button shows only with `?flasha` in the address:
-https://sweden-mesh.github.io/firmware/?flasha. Other chips and browsers get the download link
-and written steps, as do older releases.
+Tested on a Xiao S3 WIO on 2026-11-25 (two updates, settings kept) and shown to everyone since.
+Other chips and browsers get the download link and written steps, as do older releases. After
+flashing the page lets go of the port, so a terminal can open it without a reload.
 
 After the file, step 5 writes the console commands for the features chosen: the county's
 region and `set autoreply on` for auto-reply, and the command key for remote control. The

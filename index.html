@@ -516,10 +516,9 @@ function renderResult(){
 }
 
 // The page flashes ESP32 images of the release hosted next to it, in browsers with Web Serial.
-// Until it has been tested on real boards it shows only with ?flasha in the address.
-const FLASH_TRIAL = new URLSearchParams(location.search).has('flasha');
+// Tested on a Xiao S3 WIO 2026-11-25 (two updates, settings kept).
 function canFlash(img){
-  return FLASH_TRIAL && img.mcu.startsWith('esp32') && release.hosted && 'serial' in navigator;
+  return img.mcu.startsWith('esp32') && release.hosted && 'serial' in navigator;
 }
 
 async function startFlash(img, fresh){

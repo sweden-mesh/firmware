@@ -114,6 +114,20 @@ export async function flash({port, img, url, fresh, onStep, onProgress, onLog, t
     onStep(t('fl.restart'));
     await loader.after('hard_reset');
   } finally {
-    await transport.disconnect().catch(() => {});
+    await release(transport, port, onLog);
+  }
+}
+
+// Lets go of the serial port, so another program can open it without the page being reloaded.
+// The reset at the end can leave a stream locked, and then the library's disconnect never
+// returns: give it 3 s, and if the port is still open give the port up, which closes it.
+async function release(transport, port, onLog){
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  await Promise.race([transport.disconnect().catch(() => {}), wait(3000)]);
+  if (!port.readable && !port.writable) return;
+  try {
+    await Promise.race([port.forget ? port.forget() : port.close(), wait(2000)]);
+  } catch (e){
+    onLog('port: ' + (e.message || e));
   }
 }
