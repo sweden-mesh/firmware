@@ -497,7 +497,7 @@ function renderResult(){
   }
   out.innerHTML = `<div class="result">
     <h3>${pretty(hw)} — ${t('res.' + code)}${base === 'observer' ? ', Observer' : ''}</h3>
-    <p class="meta">${release.tag}${release.prerelease ? t('ver.pre') : ''} · ${t(fresh ? 'res.new' : 'res.update')} · <a href="${release.url}">${t('res.notes')}</a></p>
+    <p class="meta">${release.tag} · ${t(fresh ? 'res.new' : 'res.update')} · <a href="${release.url}">${t('res.notes')}</a></p>
     ${canFlash(img) ? `<div class="flash"><button type="button" class="btn btn-main" id="flash-btn">${t('res.flash')}</button>
       <a class="btn btn-quiet" href="${img.url}" download>${t('res.download', {size: mb(img.size)})}</a>
       <p class="hint">${t('res.flash.hint')} ${t(fresh ? 'res.flash.hint.new' : 'res.flash.hint.update')}</p>

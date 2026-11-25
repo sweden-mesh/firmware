@@ -11,7 +11,7 @@ sv: {
   'hero.p1': 'lou-firmware är MeshCore med tillägg från sweden-mesh: repeatrar som svarar på <code>test</code> så att nätet kan mäta sig självt, och fjärrstyrning med signerade kommandon. Den byggs både på vanlig MeshCore och på agessamans Observer-firmware, för alla enheter som har plats.',
   'hero.p2': 'Varje version heter som MeshCore-versionen den bygger på och ett löpnummer, till exempel <code>v1.18.0-lou-20</code>.',
   'hero.find': 'Hitta din fil',
-  'hero.readme': 'Läs mer i README',
+  'hero.readme': 'Läs mer i README (på engelska)',
 
   'alt.h': 'Det här är inte den officiella firmwaren',
   'alt.p': 'Den här sidan hör inte till MeshCore-projektet. Vill du ha MeshCore som det är, börja här:',
@@ -126,7 +126,7 @@ sv: {
   'res.arrc': 'Autosvar och fjärrstyrning',
   'res.new': 'ny installation',
   'res.update': 'uppdatering',
-  'res.notes': 'versionsinformation',
+  'res.notes': 'versionsinformation (på engelska)',
   'res.flash': 'Flasha via USB',
   'res.download': 'Ladda ner ({size})',
   'res.flash.hint': 'Anslut kortet med USB-kabel och tryck på <b>Flasha via USB</b>: webbläsaren frågar vilken port.',
