@@ -330,8 +330,8 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
   <div class="wrap"><span data-i18n="footer"></span> <span id="gen"></span></div>
 </footer>
 
-<script src="strings.js"></script>
-<script src="releases.js"></script>
+<script src="strings.js?v=5"></script>
+<script src="releases.js?v=5"></script>
 
 <script>
 const INDEX = 'index.json';
@@ -367,6 +367,9 @@ function applyStrings(){
   document.title = t('title');
   document.querySelector('meta[name="description"]').content = t('meta.description');
   for (const e of document.querySelectorAll('[data-i18n]')) e.innerHTML = t(e.dataset.i18n);
+  // The example version is the newest release, once the list is read (v1.18.0-lou-20 until then).
+  const newest = index && offered(index.releases)[0];
+  document.querySelector('[data-i18n="hero.p2"]').innerHTML = t('hero.p2', {tag: newest ? newest.tag : 'v1.18.0-lou-20'});
   for (const e of document.querySelectorAll('[data-i18n-ph]')) e.placeholder = t(e.dataset.i18nPh);
   for (const e of document.querySelectorAll('[data-i18n-label]')) e.setAttribute('aria-label', t(e.dataset.i18nLabel));
   for (const a of document.querySelectorAll('#langs a')){
@@ -608,6 +611,7 @@ async function load(){
   }
   if (!index.releases.length){ $('out').innerHTML = `<p class="hint">${t('load.none')}</p>`; return; }
   $('all').href = `https://github.com/${index.repo}/releases`;
+  applyStrings();   // the example version in the introduction
   fillReleases();
   const s = readHash();
   pickRelease(s.r);
