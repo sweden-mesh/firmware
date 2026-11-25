@@ -136,11 +136,13 @@ async function release(transport, port, onLog){
   };
   const state = () => `readable ${port.readable ? (port.readable.locked ? 'locked' : 'open') : 'none'}, writable ${port.writable ? (port.writable.locked ? 'locked' : 'open') : 'none'}`;
   onLog('port: ' + state());
-  if (await step('disconnect', () => transport.disconnect(), 3000)) return;
+  // The page asks for the port at every flash, so giving it up afterwards costs the visitor nothing.
+  const forget = () => port.forget ? step('forget', () => port.forget(), 2000) : null;
+  if (await step('disconnect', () => transport.disconnect(), 3000)) return forget();
   if (port.readable && port.readable.locked && transport.reader)
     await step('reader cancel', () => transport.reader.cancel(), 1000);
   await wait(200);
   onLog('port: ' + state());
-  if (await step('close', () => port.close(), 2000)) return;
-  if (port.forget) await step('forget', () => port.forget(), 2000);
+  await step('close', () => port.close(), 2000);
+  await forget();
 }
