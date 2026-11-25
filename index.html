@@ -275,6 +275,12 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
         <label class="field"><span data-i18n="cfg.county"></span><select id="lan"></select></label>
         <p class="hint" id="lan-hint" style="margin:-4px 0 12px"></p>
       </div>
+      <div id="cfg-obs">
+        <label class="field"><span data-i18n="cfg.wifi.ssid"></span><input type="text" id="ssid" autocomplete="off" spellcheck="false" maxlength="31"></label>
+        <label class="field"><span data-i18n="cfg.wifi.pwd"></span><input type="text" id="wifipwd" autocomplete="off" spellcheck="false" maxlength="63"></label>
+        <label class="field"><span data-i18n="cfg.iata"></span><input type="text" id="iata" autocomplete="off" spellcheck="false" maxlength="7" data-i18n-ph="cfg.iata.ph"></label>
+        <p class="hint" style="margin:-4px 0 12px" data-i18n="cfg.obs.hint"></p>
+      </div>
       <div id="cfg-rc">
         <label class="field" for="pubkey" data-i18n="cfg.key.label"></label>
         <div class="key-row">
@@ -547,14 +553,24 @@ async function startFlash(img, fresh){
 
 // Step 5: the console commands for the features chosen, after flashing.
 function renderConfig(){
-  const {code} = wanted();
+  const {code, base} = wanted();
   const ready = release && code && $('boards').value && !$('out').querySelector('.neutral');
   $('cfg').hidden = $('done').hidden = !ready;
   if (!ready) return;
   const ar = code.includes('ar'), rc = code.includes('rc');
   $('cfg-ar').hidden = !ar;
   $('cfg-rc').hidden = !rc;
+  const obs = base === 'observer';
+  $('cfg-obs').hidden = !obs;
   const lines = [];
+  if (obs){
+    // The Observer's own settings: Wi-Fi, the map code, and the MQTT preset the Swedish map reads.
+    const ssid = $('ssid').value.trim(), pwd = $('wifipwd').value, iata = $('iata').value.trim().toUpperCase();
+    $('iata').classList.toggle('bad', iata !== '' && !/^[A-Z0-9]{2,7}$/.test(iata));
+    lines.push(`set wifi.ssid ${ssid || t('cfg.wifi.ssid.placeholder')}`);
+    if (pwd) lines.push(`set wifi.pwd ${pwd}`);
+    lines.push(`set mqtt.iata ${iata || t('cfg.iata.placeholder')}`, 'set mqtt1.preset meshat.se');
+  }
   if (ar){
     const lan = $('lan').value;
     const scope = lan ? countyScope(lan) : t('cfg.county.placeholder');
@@ -570,9 +586,10 @@ function renderConfig(){
     // From lou-20 the settings are named cmd.*; lou-19 and older know only mqtt.cmd.*.
     const rev = Number((/-lou-(\d+)/.exec(release ? release.tag : '') || [])[1] || 0);
     const p = rev >= 20 ? 'cmd' : 'mqtt.cmd';
-    lines.push(`set ${p}.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, `set ${p} on`, 'reboot');
+    lines.push(`set ${p}.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, `set ${p} on`);
   }
-  $('cmds-h').textContent = t('cfg.cmds', {features: t('res.' + code).toLowerCase()});
+  if (obs || rc) lines.push('reboot');
+  $('cmds-h').textContent = t('cfg.cmds', {features: (obs ? 'Observer, ' : '') + t('res.' + code).toLowerCase()});
   $('cmds').textContent = lines.join('\n');
   const esc = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const channel = '#test-' + (ar && $('lan').value ? countyScope($('lan').value) : esc(t('cfg.county.placeholder')));
@@ -648,6 +665,7 @@ for (const i of document.querySelectorAll('input[name="f"]')){
 for (const i of document.querySelectorAll('input[name="install"]')) i.addEventListener('change', render);
 $('lan').addEventListener('change', render);
 $('pubkey').addEventListener('input', renderConfig);
+for (const id of ['ssid', 'wifipwd', 'iata']) $(id).addEventListener('input', renderConfig);
 const hex = bytes => [...bytes].map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
 
 // An Ed25519 key made here and never sent anywhere: the public half fills the field, the
