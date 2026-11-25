@@ -11,10 +11,9 @@ then the board. The answer is one file and how to flash it.
   else `sv` for a Swedish browser and `en` for any other. The switch in the header sets all three.
 - `tools/test_strings.mjs` — checks that both tables have the same keys and placeholders:
   `node --test tools/test_strings.mjs`.
-- `releases.js` — which releases the page offers. **Release** (the default) offers the full
-  releases and never a pre-release or a draft. **Pre-release** (`?channel=prerelease`) offers one
-  release at most: the newest pre-release, and nothing when a full release is newer than it.
-- `tools/test_releases.mjs` — checks those rules and the address parameter:
+- `releases.js` — which releases the page offers: the full releases, newest first, and never a
+  pre-release or a draft.
+- `tools/test_releases.mjs` — checks those rules:
   `node --test tools/test_releases.mjs`.
 - `index.json` — every image in the releases: board, base (stock or Observer), features, chip,
   file, size, sha256 and download URL. The latest full release is marked `hosted`. The page
@@ -60,8 +59,7 @@ Choices with no image of ours lead onward: no features to MeshCore's web flasher
 alone to agessaman's Observer firmware.
 
 The choice lives in the URL, so a link can be shared: `#f=obs,ar,rc&install=new&hw=heltec_v4`, in
-English `?lang=en#f=obs,ar,rc&install=new&hw=heltec_v4`. A link to the pre-release has
-`?channel=prerelease` before the `#`.
+English `?lang=en#f=obs,ar,rc&install=new&hw=heltec_v4`.
 
 ## Hosting
 
