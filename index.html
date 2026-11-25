@@ -283,7 +283,7 @@ footer{border-top:1px solid var(--line);padding:22px 0 40px;font-size:.88rem;col
         </div>
         <p class="hint" id="pubkey-hint" style="margin:8px 0 12px" data-i18n="cfg.key.hint"></p>
       </div>
-      <div class="cmd-row"><b data-i18n="cfg.cmds"></b><button type="button" class="copy" id="copy" data-i18n="copy"></button></div>
+      <div class="cmd-row"><b id="cmds-h"></b><button type="button" class="copy" id="copy" data-i18n="copy"></button></div>
       <pre class="cmds" id="cmds"></pre>
     </fieldset>
 
@@ -572,6 +572,7 @@ function renderConfig(){
     const p = rev >= 20 ? 'cmd' : 'mqtt.cmd';
     lines.push(`set ${p}.pubkey ${ok ? key.toUpperCase() : t('cfg.key.placeholder')}`, `set ${p} on`, 'reboot');
   }
+  $('cmds-h').textContent = t('cfg.cmds', {features: t('res.' + code).toLowerCase()});
   $('cmds').textContent = lines.join('\n');
   const esc = s => s.replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const channel = '#test-' + (ar && $('lan').value ? countyScope($('lan').value) : esc(t('cfg.county.placeholder')));
